@@ -1,4 +1,3 @@
-#pragma once
 #ifdef BACKEND_VULKAN
 #include "backend.hpp"
 
