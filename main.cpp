@@ -6,11 +6,11 @@ constexpr int N_iterations = 500;
 
 int main()
 {
-    State state = State({100, 100, 100}, 1, 1e-3);
-    
+    State state = State({100, 100, 1}, 1, 1e-3);
+
     std::vector<Pair_Stencil> stencils;
 
-    
+
     Pair_Stencil temp; 
     temp.i = 0;
     temp.j = 0;
