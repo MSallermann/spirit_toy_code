@@ -39,12 +39,14 @@ elseif(${CUDA_BACKEND})
         include(CheckLanguage)
         check_language(CUDA)
         enable_language(CUDA)
-
-        # set_target_properties( run PROPERTIES CUDA_SEPERABLE_COMPILATION ON )
         if(NOT DEFINED CMAKE_CUDA_STANDARD)
                 set(CMAKE_CUDA_STANDARD 11)
                 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
         endif()
+
+        set( CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo --expt-relaxed-constexpr --expt-extended-lambda" )
+        set_target_properties( run PROPERTIES CUDA_SEPERABLE_COMPILATION ON )
+
         target_compile_definitions( run PUBLIC -DBACKEND_CUDA)
 
         set_source_files_properties(

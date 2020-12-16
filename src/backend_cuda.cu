@@ -25,7 +25,7 @@ void gradient(Backend_Handle & state)
     {
         g = {0,0,0};
     }
-    
+
     for(int c=0; c<Nc; c++)
     {
         for(int b=0; b<Nb; b++)
