@@ -1,0 +1,1 @@
+g++ -DBACKEND_CPU main.cpp src/backend_cpu.cpp State.cpp -I. -I thirdparty -o run.out -O3 #-flto -march=native -funroll-loops -DEIGEN_FAST_MATH=0 -DEIGEN_NO_DEBUG -DDEBUG_PRINT
