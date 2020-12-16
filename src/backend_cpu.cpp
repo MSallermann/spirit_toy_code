@@ -14,19 +14,6 @@ inline void debug_print(T msg)
         std::cout << msg << "\n";
     #endif
 }
-// struct Backend_Handle
-// {
-//     int* n_cells; 
-//     int n_cell_atoms; 
-//     Vector3* spins;
-//     Pair_Stencil* pair_stencils;
-//     int N_pair;
-//     int nos;
-//     scalar timestep;
-//     std::vector<Vector3> gradient;
-// };
-
-
 
 void create_backend_handle(State & state)
 {
@@ -38,14 +25,7 @@ void create_backend_handle(State & state)
     res.N_pair        = state.pair_stencils.size();
     res.timestep      = state.timestep;
     res.nos           = state.Nos();
-    // debug_print(res.nos);
-    // debug_print(state.spins.size());
     res.gradient      = std::vector<Vector3>(res.nos);
-}
-
-void idx_from_pair(int idx, Pair_Stencil & stencil)
-{
-    
 }
 
 void gradient(Backend_Handle & state)
@@ -69,7 +49,6 @@ void gradient(Backend_Handle & state)
                 for(int i=0; i<state.n_cell_atoms; i++)
                 {
                     idx_i = i + state.n_cell_atoms * (a + Na * (b + Nb * c));
-                    // debug_print(idx_i);
                     for(int p=0; p<state.N_pair; p++)
                     {
                         const Pair_Stencil & pair = state.pair_stencils[p];
@@ -87,10 +66,8 @@ void gradient(Backend_Handle & state)
 
 void propagate_spins(Backend_Handle & state)
 {
-    // debug_print("propagate spins");
     for(int idx=0; idx<state.nos; idx++)
     {
-        // debug_print(idx);
         state.spins[idx] += state.timestep * state.gradient[idx];
         state.spins[idx].normalize();
     }
@@ -100,9 +77,7 @@ void iterate(Backend_Handle & state, int N_iterations)
 {
     for(int iter=0; iter<N_iterations; iter++)
     {
-        // debug_print('1');
         gradient(state);
-        // debug_print('2');
         propagate_spins(state);
     }
 }

@@ -2,11 +2,11 @@
 #include <chrono>
 #include "backend.hpp"
 
-constexpr int N_iterations = 800;
+constexpr int N_iterations = 500;
 
 int main()
 {
-    State state = State({100, 100, 1}, 1, 1e-3);
+    State state = State({100, 100, 100}, 1, 1e-3);
     
     std::vector<Pair_Stencil> stencils;
 
@@ -34,5 +34,5 @@ int main()
     std::cout << "Elapsed time: " << elapsed_seconds.count() * 1e3 << " ms (" << N_iterations << " iterations)\n";
     std::cout << "              " << elapsed_seconds.count() / N_iterations * 1e3 << " ms per iteration\n";
     std::cout << "              " <<  N_iterations / elapsed_seconds.count() << " iterations per second\n";
-    
+
 }
