@@ -4,6 +4,18 @@
 #ifdef USE_OPENMP
 #include "omp.h"
 #endif
+
+std::string description()
+{
+    std::string des;
+    #ifdef USE_OPENMP
+        des = "CPU with OpenMP and " + std::to_string(omp_get_max_threads()) + " thread(s)";
+    #else
+        des = "CPU";
+    #endif
+    return des;
+}
+
 void create_backend_handle(State & state)
 {
     Backend_Handle& res = state.backend;
@@ -22,13 +34,14 @@ void gradient(Backend_Handle & state)
     int Na = state.n_cells[0];
     int Nb = state.n_cells[1];
     int Nc = state.n_cells[2];
-    int idx_i, idx_j;
 
+    #pragma omp parallel for
     for(Vector3 & g : state.gradient)
     {
         g = {0,0,0};
     }
 
+    #pragma omp parallel for collapse(3)
     for(int c=0; c<Nc; c++)
     {
         for(int b=0; b<Nb; b++)
@@ -37,11 +50,11 @@ void gradient(Backend_Handle & state)
             {
                 for(int i=0; i<state.n_cell_atoms; i++)
                 {
-                    idx_i = i + state.n_cell_atoms * (a + Na * (b + Nb * c));
+                    int idx_i = i + state.n_cell_atoms * (a + Na * (b + Nb * c));
                     for(int p=0; p<state.N_pair; p++)
                     {
                         const Pair_Stencil & pair = state.pair_stencils[p];
-                        idx_j = pair.j + state.n_cell_atoms * ( (a + pair.da) + Na * (b + pair.db + Nc * (c + pair.dc) ) );
+                        int idx_j = pair.j + state.n_cell_atoms * ( (a + pair.da) + Na * (b + pair.db + Nc * (c + pair.dc) ) );
                         if(i==pair.i && idx_j>0 && idx_j<state.nos)
                         {
                             state.gradient[idx_i] += pair.matrix * state.spins[idx_j];
@@ -55,6 +68,7 @@ void gradient(Backend_Handle & state)
 
 void propagate_spins(Backend_Handle & state)
 {
+    #pragma omp parallel for
     for(int idx=0; idx<state.nos; idx++)
     {
         state.spins[idx] += state.timestep * state.gradient[idx];

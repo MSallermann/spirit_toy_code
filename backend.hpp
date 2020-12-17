@@ -16,6 +16,7 @@ inline void debug_print(T msg)
     #endif
 }
 
+std::string description();
 void create_backend_handle(State & state);
 void iterate(Backend_Handle & state, int N_iterations);
 

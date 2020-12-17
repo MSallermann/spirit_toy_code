@@ -1,6 +1,13 @@
 #ifdef BACKEND_CUDA
 #include "backend.hpp"
 
+std::string description()
+{
+    std::string des;
+    des = "CUDA";
+    return des;
+}
+
 void create_backend_handle(State & state)
 {
     Backend_Handle& res = state.backend;
