@@ -8,17 +8,31 @@ std::string description()
     return des;
 }
 
+Backend_Handle::~Backend_Handle()
+{
+    cudaFree(gradient);
+}
+
 void create_backend_handle(State & state)
 {
     Backend_Handle& res = state.backend;
-    res.n_cells         = state.n_cells.data();
+
+    // res.n_cells         = state.n_cells.data();
+    cudaMalloc(&res.n_cells, sizeof(int) * 3);
+
     res.n_cell_atoms    = state.n_cell_atoms;
-    res.spins           = state.spins.data();
-    res.pair_stencils   = state.pair_stencils.data();
+
+    // res.spins         = state.spins.data();
+    cudaMalloc(&res.spins, sizeof(Vector3) * state.Nos());
+
+    // res.pair_stencils   = state.pair_stencils.data();
+    cudaMalloc(&res.pair_stencils, sizeof(Pair_Stencil) * state.pair_stencils.size());
+
     res.N_pair          = state.pair_stencils.size();
     res.timestep        = state.timestep;
     res.nos             = state.Nos();
-    res.gradient        = std::vector<Vector3>(res.nos);
+
+    cudaMalloc(&res.gradient, sizeof(Vector3) * state.Nos());
 }
 
 void gradient(Backend_Handle & state)
@@ -28,9 +42,9 @@ void gradient(Backend_Handle & state)
     int Nc = state.n_cells[2];
     int idx_i, idx_j;
 
-    for(Vector3 & g : state.gradient)
+    for(int i=0; i<state.nos; i++)
     {
-        g = {0,0,0};
+        state.gradient[i] = {0,0,0};
     }
 
     for(int c=0; c<Nc; c++)
