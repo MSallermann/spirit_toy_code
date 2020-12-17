@@ -1,6 +1,9 @@
 #ifdef BACKEND_CPU
 #include "backend.hpp"
 
+#ifdef USE_OPENMP
+#include "omp.h"
+#endif
 void create_backend_handle(State & state)
 {
     Backend_Handle& res = state.backend;
