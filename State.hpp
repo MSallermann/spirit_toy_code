@@ -16,6 +16,7 @@ struct Pair_Stencil
 
 struct Backend_Handle
 {
+    ~Backend_Handle();
     int* n_cells; 
     int n_cell_atoms; 
     Vector3* spins;
@@ -23,7 +24,7 @@ struct Backend_Handle
     int N_pair;
     int nos;
     scalar timestep;
-    std::vector<Vector3> gradient;
+    Vector3 * gradient;
 };
 
 class State
@@ -37,7 +38,7 @@ class State
     {
         return n_cell_atoms * n_cells[0] * n_cells[1] * n_cells[2];
     }
-    
+
     Backend_Handle backend;
     std::array<int, 3> n_cells; 
     int n_cell_atoms; 

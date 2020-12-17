@@ -16,6 +16,11 @@ std::string description()
     return des;
 }
 
+Backend_Handle::~Backend_Handle()
+{
+    delete[] gradient;
+}
+
 void create_backend_handle(State & state)
 {
     Backend_Handle& res = state.backend;
@@ -26,7 +31,7 @@ void create_backend_handle(State & state)
     res.N_pair        = state.pair_stencils.size();
     res.timestep      = state.timestep;
     res.nos           = state.Nos();
-    res.gradient      = std::vector<Vector3>(res.nos);
+    res.gradient      = new Vector3[state.Nos()];
 }
 
 void gradient(Backend_Handle & state)
@@ -36,9 +41,9 @@ void gradient(Backend_Handle & state)
     int Nc = state.n_cells[2];
 
     #pragma omp parallel for
-    for(Vector3 & g : state.gradient)
+    for(int i=0; i<state.nos; i++)
     {
-        g = {0,0,0};
+        state.gradient[i] = {0,0,0};
     }
 
     #pragma omp parallel for collapse(3)
