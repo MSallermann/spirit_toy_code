@@ -1,6 +1,42 @@
 cmake_minimum_required( VERSION 3.10 )
 cmake_policy( SET CMP0025 NEW )
+
+# set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+# set( CMAKE_CXX_STANDARD 11 )
+
+list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" )
+set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
+
+
+### Set a default build type in case none is passed
+if( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
+    message( STATUS ">> Setting build type to 'Release' as none was specified." )
+    set( CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE )
+    # Set the possible values of build type for cmake-gui
+    set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
+elseif( CMAKE_BUILD_TYPE )
+    message( STATUS ">> Did not need to set build type, using: ${CMAKE_BUILD_TYPE}" )
+else()
+    message( STATUS ">> Did not need to set build type. Configuration types: ${CMAKE_CONFIGURATION_TYPES}" )
+endif()
+
+if( APPLE )
+    set( PLATFORM_NAME "Apple" )
+elseif( UNIX )
+    set( PLATFORM_NAME "UNIX" )
+elseif( WIN32 )
+    set( PLATFORM_NAME "Win32" )
+endif()
+
+include( ChooseCompiler )
 project(spirit_toy_code)
+include( CompilerFlags )
+
+message( STATUS ">> Please check the CMAKE_CXX_COMPILER to make sure it's the right one" )
+message( STATUS ">> CMAKE_C_COMPILER:   ${CMAKE_C_COMPILER}" )
+message( STATUS ">> CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}" )
+
+
 
 set(CPU_BACKEND ON)
 set(CUDA_BACKEND ON)
@@ -38,7 +74,6 @@ set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
 if (${CPU_BACKEND})
         message("Building CPU backend")
         set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS} -DBACKEND_CPU)
-        
         if(USE_OPENMP)
                 find_package(OpenMP)
                 if(OpenMP_CXX_FOUND)
@@ -72,3 +107,6 @@ endif()
 
 target_compile_definitions( run PUBLIC ${COMPILE_DEFINITIONS})
 target_compile_options( run PUBLIC ${COMPILE_OPTIONS})
+
+enable_testing()
+add_test( run  run )
