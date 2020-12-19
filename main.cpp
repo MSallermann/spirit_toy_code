@@ -36,7 +36,6 @@ int main(int argc, char* argv[])
         stencils.push_back( temp );
 
     state.Set_Pair_Stencils(stencils);
-    state.Create_Backend_Handle();
 
     auto start = std::chrono::high_resolution_clock::now();
     iterate(state.backend, N_iterations);

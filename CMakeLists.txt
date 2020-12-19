@@ -1,12 +1,15 @@
 cmake_minimum_required( VERSION 3.10 )
 cmake_policy( SET CMP0025 NEW )
 
-# set( CMAKE_POSITION_INDEPENDENT_CODE ON )
-# set( CMAKE_CXX_STANDARD 11 )
+# =============================================
+set(CPU_BACKEND ON)
+set(CUDA_BACKEND OFF)
+set(VULKAN_BACKEND OFF)
+set(USE_OPENMP ON)
+# =============================================
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" )
 set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
-
 
 ### Set a default build type in case none is passed
 if( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
@@ -36,13 +39,6 @@ message( STATUS ">> Please check the CMAKE_CXX_COMPILER to make sure it's the ri
 message( STATUS ">> CMAKE_C_COMPILER:   ${CMAKE_C_COMPILER}" )
 message( STATUS ">> CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}" )
 
-
-
-set(CPU_BACKEND ON)
-set(CUDA_BACKEND ON)
-set(VULKAN_BACKEND OFF)
-set(USE_OPENMP ON)
-
 if(NOT DEFINED CMAKE_CUDA_STANDARD)
         set(CMAKE_CXX_STANDARD 11)
         set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,9 +47,12 @@ endif()
 set( SRC 
         ${PROJECT_SOURCE_DIR}/main.cpp
         ${PROJECT_SOURCE_DIR}/State.cpp
-        ${PROJECT_SOURCE_DIR}/src/backend_cpu.cpp
-        ${PROJECT_SOURCE_DIR}/src/backend_cuda.cu
-        ${PROJECT_SOURCE_DIR}/src/backend_vulkan.cpp
+        ${PROJECT_SOURCE_DIR}/src/backend_cpu/backend_cpu.cpp
+        ${PROJECT_SOURCE_DIR}/src/backend_cpu/backend_handle.cpp
+        ${PROJECT_SOURCE_DIR}/src/backend_cuda/backend_cuda.cu
+        ${PROJECT_SOURCE_DIR}/src/backend_cuda/backend_handle.cu
+        ${PROJECT_SOURCE_DIR}/src/backend_vulkan/backend_vulkan.cpp
+        ${PROJECT_SOURCE_DIR}/src/backend_vulkan/backend_handle.cpp
 )
 
 set( INCLUDE 

@@ -12,4 +12,14 @@
 using Matrix3 = Eigen::Matrix<scalar, 3, 3>;
 using Vector3 = Eigen::Matrix<scalar, 3, 1>;
 
+struct Pair_Stencil
+{
+    int i;
+    int j;
+    int da;
+    int db;
+    int dc;
+    Matrix3 matrix;
+};
+
 #endif
