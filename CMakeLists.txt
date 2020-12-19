@@ -32,7 +32,7 @@ elseif( WIN32 )
 endif()
 
 include( ChooseCompiler )
-project(spirit_toy_code)
+project( spirit_toy_code )
 include( CompilerFlags )
 
 message( STATUS ">> Please check the CMAKE_CXX_COMPILER to make sure it's the right one" )
@@ -68,7 +68,6 @@ add_custom_command(TARGET run
 
 target_include_directories( run PUBLIC ${INCLUDE} )
 
-set(COMPILE_OPTIONS ${COMPILE_OPTIONS} "-O3")
 set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
 
 if (${CPU_BACKEND})

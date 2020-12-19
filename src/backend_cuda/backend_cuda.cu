@@ -9,21 +9,6 @@ std::string description()
     return des;
 }
 
-Backend_Handle::~Backend_Handle()
-{
-    cudaFree( n_cells );
-    cudaFree( spins );
-    cudaFree( pair_stencils );
-    cudaFree( gradient );
-}
-
-void Backend_Handle::Download( State & state )
-{
-    Cuda_Backend::copy_vector_H2D( state.n_cells, res.n_cells );
-    Cuda_Backend::copy_vector_H2D( state.spins, res.spins );
-    Cuda_Backend::copy_vector_H2D( state.pair_stencils, res.pair_stencils );
-}
-
 void create_backend_handle( State & state )
 {
     Backend_Handle & res = state.backend;
