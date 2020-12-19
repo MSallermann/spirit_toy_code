@@ -4,9 +4,9 @@
 #include "Eigen/Dense"
 
 #ifdef BACKEND_CPU
-    using scalar = double;
+using scalar = double;
 #else
-    using scalar = float;
+using scalar = float;
 #endif
 
 using Matrix3 = Eigen::Matrix<scalar, 3, 3>;

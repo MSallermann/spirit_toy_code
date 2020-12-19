@@ -3,8 +3,7 @@
 #include "State.hpp"
 #include <iostream>
 
-Backend_Handle::Backend_Handle()
-{}
+Backend_Handle::Backend_Handle() {}
 
 void Backend_Handle::Allocate( State & state )
 {
@@ -16,18 +15,18 @@ void Backend_Handle::Allocate( State & state )
     this->timestep      = state.timestep;
     this->nos           = state.Nos();
 
-    if (this->gradient != nullptr)
+    if( this->gradient != nullptr )
         delete[] gradient;
 
-    this->gradient      = new Vector3[state.Nos()];
+    this->gradient = new Vector3[state.Nos()];
 }
 
-void Backend_Handle::Upload(State & state)
+void Backend_Handle::Upload( State & state )
 {
     // Nothing to be done
 }
 
-void Backend_Handle::Download(State & state)
+void Backend_Handle::Download( State & state )
 {
     // Nothing to be done
 }

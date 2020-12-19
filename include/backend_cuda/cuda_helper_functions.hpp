@@ -1,7 +1,6 @@
 #pragma once
 #ifndef CUDA_HELPER_FUNCTIONS
 #include <vector>
-#include "State.hpp"
 
 namespace Cuda_Backend{
 
