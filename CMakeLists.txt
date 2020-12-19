@@ -58,6 +58,7 @@ set( SRC
 set( INCLUDE 
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/thirdparty
+        ${PROJECT_SOURCE_DIR}/include
 )
 
 add_executable( run ${SRC})

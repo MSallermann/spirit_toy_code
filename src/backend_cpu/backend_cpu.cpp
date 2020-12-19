@@ -1,6 +1,6 @@
 #ifdef BACKEND_CPU
 #include "backend.hpp"
-
+#include "backend_cpu/cpu_helper_functions.hpp"
 #include <iostream>
 
 #ifdef USE_OPENMP
@@ -36,6 +36,7 @@ void gradient(Backend_Handle & state)
     int Na = state.n_cells[0];
     int Nb = state.n_cells[1];
     int Nc = state.n_cells[2];
+    int N_cells_total = Na*Nb*Nc;
 
     #pragma omp parallel for
     for(int i=0; i<state.nos; i++)
@@ -43,25 +44,22 @@ void gradient(Backend_Handle & state)
         state.gradient[i] = {0,0,0};
     }
 
-    #pragma omp parallel for collapse(3)
-    for(int c=0; c<Nc; c++)
+    int tupel[3];
+    #pragma omp parallel for private(tupel)
+    for(int i_cell = 0; i_cell < N_cells_total; i_cell++)
     {
-        for(int b=0; b<Nb; b++)
+        tupel_from_idx(i_cell, tupel, state.n_cells, 3);
+        int a = tupel[0], b=tupel[1], c=tupel[2];
+        for(int i=0; i<state.n_cell_atoms; i++)
         {
-            for(int a=0; a<Na; a++)
+            int idx_i = i + state.n_cell_atoms * (i_cell);
+            for(int p=0; p<state.N_pair; p++)
             {
-                for(int i=0; i<state.n_cell_atoms; i++)
+                const Pair_Stencil & pair = state.pair_stencils[p];
+                int idx_j = pair.j + state.n_cell_atoms * ( (a + pair.da) + Na * (b + pair.db + Nc * (c + pair.dc) ) );
+                if(i==pair.i && idx_j>0 && idx_j<state.nos)
                 {
-                    int idx_i = i + state.n_cell_atoms * (a + Na * (b + Nb * c));
-                    for(int p=0; p<state.N_pair; p++)
-                    {
-                        const Pair_Stencil & pair = state.pair_stencils[p];
-                        int idx_j = pair.j + state.n_cell_atoms * ( (a + pair.da) + Na * (b + pair.db + Nc * (c + pair.dc) ) );
-                        if(i==pair.i && idx_j>0 && idx_j<state.nos)
-                        {
-                            state.gradient[idx_i] += pair.matrix * state.spins[idx_j];
-                        }
-                    }
+                    state.gradient[idx_i] += pair.matrix * state.spins[idx_j];
                 }
             }
         }
