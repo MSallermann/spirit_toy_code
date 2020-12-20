@@ -3,7 +3,7 @@
 #include "State.hpp"
 #include <iostream>
 
-Backend_Handle::Backend_Handle(State & state) 
+Backend_Handle::Backend_Handle( State & state )
 {
     this->n_cells       = state.n_cells.data();
     this->n_cell_atoms  = state.n_cell_atoms;
@@ -12,7 +12,7 @@ Backend_Handle::Backend_Handle(State & state)
     this->N_pair        = state.pair_stencils.size();
     this->timestep      = state.timestep;
     this->nos           = state.Nos();
-    this->gradient = new Vector3[state.Nos()];
+    this->gradient      = new Vector3[state.Nos()];
 }
 
 void Backend_Handle::Upload( State & state )

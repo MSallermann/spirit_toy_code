@@ -1,4 +1,5 @@
-run
+spirit_CPU
+spirit_CUDA
 build/
 .vscode/
 temp/

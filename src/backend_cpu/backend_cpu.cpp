@@ -31,7 +31,7 @@ void gradient( Backend_Handle & state )
         state.gradient[i] = { 0, 0, 0 };
     }
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for( int i_cell = 0; i_cell < N_cells_total; i_cell++ )
     {
         int tupel[3];

@@ -8,14 +8,8 @@ std::string description()
     return des;
 }
 
-void gradient()
-{
-    
-}
+void gradient() {}
 
-void iterate(State & state, int N_iterations)
-{
-    
-}
+void iterate( State & state, int N_iterations ) {}
 
 #endif

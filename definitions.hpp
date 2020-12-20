@@ -15,7 +15,7 @@ using Vector3 = Eigen::Matrix<scalar, 3, 1>;
 struct Pair_Stencil
 {
     Pair_Stencil() {}
-    Pair_Stencil(int i, int j, int da, int db, int dc, Matrix3 matrix) : i(i), j(j), da(da), db(db), dc(dc), matrix(matrix) {}
+    Pair_Stencil( int i, int j, int da, int db, int dc, Matrix3 matrix ) : i( i ), j( j ), da( da ), db( db ), dc( dc ), matrix( matrix ) {}
     int i;
     int j;
     int da;

@@ -28,27 +28,25 @@ int main( int argc, char * argv[] )
     std::vector<Pair_Stencil> stencils;
 
     Matrix3 matrix;
-    matrix <<  1, 0, 1,
-               0, 1, 0,
-              -1, 0, 1;
+    matrix << 1, 0, 1, 0, 1, 0, -1, 0, 1;
 
-    stencils.push_back(Pair_Stencil(0,0,1,0,0, matrix));
-    stencils.push_back(Pair_Stencil(0,0,-1,0,0, matrix));
-    stencils.push_back(Pair_Stencil(0,0,0,1,0, matrix));
-    stencils.push_back(Pair_Stencil(0,0,0,-1,0, matrix));
-    stencils.push_back(Pair_Stencil(0,0,0,0,1, matrix));
-    stencils.push_back(Pair_Stencil(0,0,0,0,-1, matrix));
+    stencils.push_back( Pair_Stencil( 0, 0, 1, 0, 0, matrix ) );
+    stencils.push_back( Pair_Stencil( 0, 0, -1, 0, 0, matrix ) );
+    stencils.push_back( Pair_Stencil( 0, 0, 0, 1, 0, matrix ) );
+    stencils.push_back( Pair_Stencil( 0, 0, 0, -1, 0, matrix ) );
+    stencils.push_back( Pair_Stencil( 0, 0, 0, 0, 1, matrix ) );
+    stencils.push_back( Pair_Stencil( 0, 0, 0, 0, -1, matrix ) );
 
     state.Set_Pair_Stencils( stencils );
 
-    state.Set_Domain( {2,2,2} );
+    state.Set_Domain( { 2, 2, 2 } );
 
     std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
     std::cout << "Sart Iterations\n";
 
     auto start = std::chrono::high_resolution_clock::now();
     iterate( state, N_iterations );
-    auto end = std::chrono::high_resolution_clock::now(  );
+    auto end = std::chrono::high_resolution_clock::now();
 
     std::cout << "End Iterations\n";
     std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";

@@ -3,8 +3,8 @@
 #include "backend_handle.hpp"
 #include "definitions.hpp"
 #include <array>
-#include <vector>
 #include <memory>
+#include <vector>
 
 class State
 {
@@ -20,7 +20,7 @@ public:
     void Set_Domain( const Vector3 & vec )
     {
 #pragma omp parallel for
-        for( int i=0; i<this->Nos(); i++ )
+        for( int i = 0; i < this->Nos(); i++ )
         {
             this->spins[i] = vec;
         }
@@ -29,7 +29,7 @@ public:
 
     void Create_Backend()
     {
-       this->backend = std::unique_ptr<Backend_Handle>(new Backend_Handle(*this));
+        this->backend = std::unique_ptr<Backend_Handle>( new Backend_Handle( *this ) );
     }
 
     std::unique_ptr<Backend_Handle> backend;

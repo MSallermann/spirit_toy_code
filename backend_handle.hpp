@@ -8,7 +8,7 @@ class State;
 
 struct Backend_Handle
 {
-    Backend_Handle(State & state);
+    Backend_Handle( State & state );
     ~Backend_Handle();
 
     void Upload( State & state );
