@@ -27,17 +27,18 @@ int main( int argc, char * argv[] )
 
     std::vector<Pair_Stencil> stencils;
 
-    Pair_Stencil temp;
-    temp.i  = 0;
-    temp.j  = 0;
-    temp.da = 1;
-    temp.db = 2;
-    temp.dc = 3;
+    Matrix3 matrix;
+    matrix <<  1, 0, 1,
+               0, 1, 0,
+              -1, 0, 1;
 
-    temp.matrix << 1, 2, 3, 1, 2, 3, 1, 2, 3;
+    stencils.push_back(Pair_Stencil(0,0,1,0,0, matrix));
+    stencils.push_back(Pair_Stencil(0,0,-1,0,0, matrix));
+    stencils.push_back(Pair_Stencil(0,0,0,1,0, matrix));
+    stencils.push_back(Pair_Stencil(0,0,0,-1,0, matrix));
+    stencils.push_back(Pair_Stencil(0,0,0,0,1, matrix));
+    stencils.push_back(Pair_Stencil(0,0,0,0,-1, matrix));
 
-    for( int i = 0; i < 10; i++ )
-        stencils.push_back( temp );
     state.Set_Pair_Stencils( stencils );
 
     state.Set_Domain( {2,2,2} );

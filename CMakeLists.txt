@@ -5,7 +5,7 @@ cmake_policy( SET CMP0025 NEW )
 set(CPU_BACKEND ON)
 set(CUDA_BACKEND ON)
 set(VULKAN_BACKEND OFF)
-set(USE_OPENMP ON) # Use openMP to accelerate host code
+set(USE_OPENMP ON) # Use openMP to accelerate host code and CPU backend
 # =============================================
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" )
