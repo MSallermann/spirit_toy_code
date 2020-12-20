@@ -18,19 +18,6 @@ std::string description()
     return des;
 }
 
-void create_backend_handle( State & state )
-{
-    Backend_Handle & res = state.backend;
-    res.n_cells          = state.n_cells.data();
-    res.n_cell_atoms     = state.n_cell_atoms;
-    res.spins            = state.spins.data();
-    res.pair_stencils    = state.pair_stencils.data();
-    res.N_pair           = state.pair_stencils.size();
-    res.timestep         = state.timestep;
-    res.nos              = state.Nos();
-    res.gradient         = new Vector3[state.Nos()];
-}
-
 void gradient( Backend_Handle & state )
 {
     int Na            = state.n_cells[0];
@@ -76,13 +63,14 @@ void propagate_spins( Backend_Handle & state )
     }
 }
 
-void iterate( Backend_Handle & state, int N_iterations )
+void iterate( State & state, int N_iterations )
 {
     for( int iter = 0; iter < N_iterations; iter++ )
     {
-        gradient( state );
-        propagate_spins( state );
+        gradient( *state.backend );
+        propagate_spins( *state.backend );
     }
+    state.backend->Download( state );
 }
 
 #endif

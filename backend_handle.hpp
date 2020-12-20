@@ -8,12 +8,14 @@ class State;
 
 struct Backend_Handle
 {
-    Backend_Handle();
+    Backend_Handle(State & state);
     ~Backend_Handle();
 
-    void Allocate( State & state ); // Allocates buffers for spins, gradient, pairs and updates them with the host information
     void Upload( State & state );
     void Download( State & state );
+
+    // The *device* pointer to this Backend Handle
+    Backend_Handle * dev_ptr;
 
     int * n_cells;
     int n_cell_atoms;

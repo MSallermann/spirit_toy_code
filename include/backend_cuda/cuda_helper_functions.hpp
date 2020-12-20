@@ -5,19 +5,19 @@
 namespace Cuda_Backend{
 
     template<typename T>
-    void malloc_n(T* dev_ptr, int N)
+    void malloc_n(T* & dev_ptr, int N)
     {
         cudaMalloc( &dev_ptr, N*sizeof(T));
     }
 
     template<typename T, typename Vec>
-    void copy_vector_H2D(T* dest_dev_ptr, Vec src_host_vec)
+    void copy_vector_H2D(T* dest_dev_ptr, Vec & src_host_vec)
     {
         cudaMemcpy( dest_dev_ptr, src_host_vec.data(), src_host_vec.size()*sizeof(T), cudaMemcpyHostToDevice );
     }
 
     template<typename T, typename Vec>
-    void copy_vector_D2H(Vec dest_host_vec, T* src_dev_ptr)
+    void copy_vector_D2H(Vec & dest_host_vec, T* src_dev_ptr)
     {
         cudaMemcpy( dest_host_vec.data(), src_dev_ptr, dest_host_vec.size()*sizeof(T), cudaMemcpyDeviceToHost );
     }

@@ -4,6 +4,7 @@
 #include "definitions.hpp"
 #include <array>
 #include <vector>
+#include <memory>
 
 class State
 {
@@ -11,12 +12,27 @@ public:
     State( std::array<int, 3> n_cells, int n_cell_atoms, scalar timestep );
     void Set_Pair_Stencils( std::vector<Pair_Stencil> & stencils );
 
-    int Nos()
+    int Nos() const
     {
         return n_cell_atoms * n_cells[0] * n_cells[1] * n_cells[2];
     }
 
-    Backend_Handle backend;
+    void Set_Domain( const Vector3 & vec )
+    {
+#pragma omp parallel for
+        for( auto & s : this->spins )
+        {
+            s = vec;
+        }
+        this->backend->Upload( *this );
+    }
+
+    void Create_Backend()
+    {
+       this->backend = std::unique_ptr<Backend_Handle>(new Backend_Handle(*this));
+    }
+
+    std::unique_ptr<Backend_Handle> backend;
     std::array<int, 3> n_cells;
     int n_cell_atoms;
     scalar timestep;

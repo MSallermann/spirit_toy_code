@@ -22,4 +22,16 @@ struct Pair_Stencil
     Matrix3 matrix;
 };
 
+#ifdef DEBUG_PRINT
+#include <iostream>
+#include <string>
+#endif
+template<typename T>
+inline void debug_print( T msg )
+{
+#ifdef DEBUG_PRINT
+    std::cout << msg << "\n";
+#endif
+}
+
 #endif
