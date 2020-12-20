@@ -20,9 +20,9 @@ public:
     void Set_Domain( const Vector3 & vec )
     {
 #pragma omp parallel for
-        for( auto & s : this->spins )
+        for( int i=0; i<this->Nos(); i++ )
         {
-            s = vec;
+            this->spins[i] = vec;
         }
         this->backend->Upload( *this );
     }
