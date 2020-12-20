@@ -31,12 +31,14 @@ void gradient( Backend_Handle & state )
         state.gradient[i] = { 0, 0, 0 };
     }
 
-    int tupel[3];
-#pragma omp parallel for private( tupel )
+    #pragma omp parallel for
     for( int i_cell = 0; i_cell < N_cells_total; i_cell++ )
     {
+        int tupel[3];
         tupel_from_idx( i_cell, tupel, state.n_cells, 3 );
-        int a = tupel[0], b = tupel[1], c = tupel[2];
+        int a = tupel[0];
+        int b = tupel[1];
+        int c = tupel[2];
         for( int i = 0; i < state.n_cell_atoms; i++ )
         {
             int idx_i = i + state.n_cell_atoms * ( i_cell );

@@ -40,14 +40,16 @@ int main( int argc, char * argv[] )
         stencils.push_back( temp );
     state.Set_Pair_Stencils( stencils );
 
-    state.Set_Domain( {2,2,1} );
+    state.Set_Domain( {2,2,2} );
 
     std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
+    std::cout << "Sart Iterations\n";
 
     auto start = std::chrono::high_resolution_clock::now();
     iterate( state, N_iterations );
     auto end = std::chrono::high_resolution_clock::now(  );
 
+    std::cout << "End Iterations\n";
     std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
 
     std::chrono::duration<double> elapsed_seconds = end - start;

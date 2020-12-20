@@ -14,31 +14,34 @@ __global__ void gradient( Backend_Handle * state )
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
-    int Na = state->n_cells[0], Nb = state->n_cells[1]; //, Nc = state.n_cells[2];
-    int i, a, b, c;
-    int idx_j;
+    int Na            = state->n_cells[0];
+    int Nb            = state->n_cells[1];
+    int Nc            = state->n_cells[2];
+    int N_cells_total = Na * Nb * Nc;
 
     for( int i = index; i < state->nos; i += stride )
     {
         state->gradient[i] = { 0, 0, 0 };
     }
 
-    for( int idx_i = index; idx_i < state->nos; idx_i += stride )
+    for( int i_cell = index; i_cell < N_cells_total; i_cell += stride )
     {
-        int tupel[4];
-        Cuda_Backend::cu_tupel_from_idx( idx_i, tupel, state->n_cells, 4 ); // tupel now is {i, a, b, c}
-        i = tupel[0];
-        a = tupel[1];
-        b = tupel[2];
-        c = tupel[3];
-        for( int p = 0; p < state->N_pair; p++ )
+        int tupel[3];
+        Cuda_Backend::cu_tupel_from_idx( i_cell, tupel, state->n_cells, 3 ); // tupel now is {i, a, b, c}
+        int a = tupel[0];
+        int b = tupel[1];
+        int c = tupel[2];
+        for( int i = 0; i < state->n_cell_atoms; i++ )
         {
-            const Pair_Stencil & pair = state->pair_stencils[p];
-            idx_j                     = pair.j + state->n_cell_atoms * ( ( a + pair.da ) + Na * ( b + pair.db + Nb * ( c + pair.dc ) ) );
-
-            if( i == pair.i && idx_j > 0 && idx_j < state->nos )
+            int idx_i = i + state->n_cell_atoms * ( i_cell );
+            for( int p = 0; p < state->N_pair; p++ )
             {
-                state->gradient[idx_i] += pair.matrix * state->spins[idx_j];
+                const Pair_Stencil & pair = state->pair_stencils[p];
+                int idx_j                 = pair.j + state->n_cell_atoms * ( ( a + pair.da ) + Na * ( b + pair.db + Nc * ( c + pair.dc ) ) );
+                if( i == pair.i && idx_j > 0 && idx_j < state->nos )
+                {
+                    state->gradient[idx_i] += pair.matrix * state->spins[idx_j];
+                }
             }
         }
     }
