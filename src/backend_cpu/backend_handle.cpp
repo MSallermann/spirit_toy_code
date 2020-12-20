@@ -27,7 +27,6 @@ void Backend_Handle::Download( State & state )
 
 Backend_Handle::~Backend_Handle()
 {
-    std::cout << "Destructor Backend Handle\n";
     delete[] gradient;
 }
 
