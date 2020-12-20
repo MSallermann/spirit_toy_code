@@ -35,6 +35,7 @@ public:
     std::unique_ptr<Backend_Handle> backend;
     std::array<int, 3> n_cells;
     int n_cell_atoms;
+    int n_log = 250;
     scalar timestep;
     std::vector<Vector3> spins;
     std::vector<Pair_Stencil> pair_stencils;

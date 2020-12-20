@@ -71,6 +71,12 @@ void iterate( State & state, int N_iterations )
     {
         gradient( *state.backend );
         propagate_spins( *state.backend );
+        if( iter % state.n_log == 0 )
+        {
+            printf( "iter = %i\n", iter );
+            state.backend->Download( state );
+            std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
+        }
     }
     state.backend->Download( state );
 }

@@ -1,6 +1,7 @@
 #ifdef BACKEND_CUDA
 #include "backend.hpp"
 #include "backend_cuda/cuda_helper_functions.hpp"
+#include <iostream>
 
 std::string description()
 {
@@ -60,7 +61,6 @@ __global__ void propagate_spins( Backend_Handle * state )
 
 void iterate( State & state, int N_iterations )
 {
-
     int blockSize = 1024;
     int numBlocks = ( state.Nos() + blockSize - 1 ) / blockSize;
 
@@ -68,6 +68,12 @@ void iterate( State & state, int N_iterations )
     {
         gradient<<<numBlocks, blockSize>>>( state.backend->dev_ptr );
         propagate_spins<<<numBlocks, blockSize>>>( state.backend->dev_ptr );
+        if( iter % state.n_log == 0 )
+        {
+            printf( "iter = %i\n", iter );
+            state.backend->Download( state );
+            std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
+        }
     }
     cudaDeviceSynchronize();
     state.backend->Download( state );
