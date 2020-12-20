@@ -3,9 +3,9 @@ cmake_policy( SET CMP0025 NEW )
 
 # =============================================
 set(CPU_BACKEND ON)
-set(CUDA_BACKEND OFF)
+set(CUDA_BACKEND ON)
 set(VULKAN_BACKEND OFF)
-set(USE_OPENMP ON)
+set(USE_OPENMP ON) # Use openMP to accelerate host code
 # =============================================
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" )
@@ -33,6 +33,7 @@ endif()
 
 include( ChooseCompiler )
 project( spirit_toy_code )
+set(META_PROJECT_NAME "spirit")
 include( CompilerFlags )
 
 message( STATUS ">> Please check the CMAKE_CXX_COMPILER to make sure it's the right one" )
@@ -61,51 +62,58 @@ set( INCLUDE
         ${PROJECT_SOURCE_DIR}/include
 )
 
-add_executable( run ${SRC})
-add_custom_command(TARGET run 
-                   POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:run> ${PROJECT_SOURCE_DIR})
-
-target_include_directories( run PUBLIC ${INCLUDE} )
-
 set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
 
 if (${CPU_BACKEND})
         message("Building CPU backend")
-        set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS} -DBACKEND_CPU)
+        list(APPEND EXECUTABLE_NAMES  ${META_PROJECT_NAME}_CPU)
+        add_executable(${META_PROJECT_NAME}_CPU  ${SRC})
+        target_compile_definitions( ${META_PROJECT_NAME}_CPU PUBLIC -DBACKEND_CPU )
+endif()
+if (${CUDA_BACKEND})
+        message("Building CUDA backend")
+        include(CheckLanguage)
+        check_language(CUDA)
+        if(CMAKE_CUDA_COMPILER)
+                enable_language(CUDA)
+                if(NOT DEFINED CMAKE_CUDA_STANDARD)
+                        set(CMAKE_CUDA_STANDARD 11)
+                        set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+                endif()
+
+                list (APPEND EXECUTABLE_NAMES  ${META_PROJECT_NAME}_CUDA )
+                add_executable(${META_PROJECT_NAME}_CUDA  ${SRC})
+                target_compile_definitions( ${META_PROJECT_NAME}_CUDA PUBLIC -DBACKEND_CUDA )
+
+                set( CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo --expt-relaxed-constexpr --expt-extended-lambda" )
+                set_target_properties( ${META_PROJECT_NAME}_CUDA PROPERTIES CUDA_SEPERABLE_COMPILATION ON )
+        else()
+                message(STATUS "No CUDA support")
+                set(CUDA_BACKEND OFF)
+        endif()
+endif()
+# if()
+#         message("Building VULKAN backend")
+#         set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS} -DBACKEND_VULKAN)
+# endif()
+
+# Additional definitions for all execs
+foreach(executable IN LISTS EXECUTABLE_NAMES)
+        message(${executable})
         if(USE_OPENMP)
                 find_package(OpenMP)
                 if(OpenMP_CXX_FOUND)
                         message("Found OpenMP")
-                        target_link_libraries(run PUBLIC OpenMP::OpenMP_CXX)
-                        set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS} -DUSE_OPENMP)
+                        target_link_libraries(${executable} PUBLIC OpenMP::OpenMP_CXX)
+                        target_compile_definitions(${executable} PUBLIC -DUSE_OPENMP)
                 endif()
         endif()
-elseif (${CUDA_BACKEND})
-        message("Building CUDA backend")
-        include(CheckLanguage)
-        check_language(CUDA)
-        enable_language(CUDA)
-        if(NOT DEFINED CMAKE_CUDA_STANDARD)
-                set(CMAKE_CUDA_STANDARD 11)
-                set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-        endif()
 
-        set( CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo --expt-relaxed-constexpr --expt-extended-lambda" )
-        set_target_properties( run PROPERTIES CUDA_SEPERABLE_COMPILATION ON )
-
-        set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS} -DBACKEND_CUDA)
-
-        set_source_files_properties(
-                PROPERTIES LANGUAGE CUDA
-        )
-else()
-        message("Building VULKAN backend")
-        set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS} -DBACKEND_VULKAN)
-endif()
-
-target_compile_definitions( run PUBLIC ${COMPILE_DEFINITIONS})
-target_compile_options( run PUBLIC ${COMPILE_OPTIONS})
+        target_include_directories( ${executable} PUBLIC ${INCLUDE} )
+        add_custom_command(TARGET ${executable} 
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${executable}> ${PROJECT_SOURCE_DIR})
+        add_test( ${executable} ${executable} )
+endforeach()
 
 enable_testing()
-add_test( run  run )
