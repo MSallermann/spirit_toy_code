@@ -18,12 +18,12 @@ std::string description()
     return des;
 }
 
-void gradient( Backend_Handle & state )
+template<int N, typename Stencil>
+void stencil_gradient( Device_State state, Stencil * stencils, int N_Stencil )
 {
-    int Na            = state.n_cells[0];
-    int Nb            = state.n_cells[1];
-    int Nc            = state.n_cells[2];
-    int N_cells_total = Na * Nb * Nc;
+    int Na = state.n_cells[0];
+    int Nb = state.n_cells[1];
+    // int Nc = state.n_cells[2]; Not needed
 
 #pragma omp parallel for
     for( int i = 0; i < state.nos; i++ )
@@ -32,30 +32,48 @@ void gradient( Backend_Handle & state )
     }
 
 #pragma omp parallel for
-    for( int i_cell = 0; i_cell < N_cells_total; i_cell++ )
+    for( int i_cell = 0; i_cell < state.n_cells_total; i_cell++ )
     {
         int tupel[3];
-        tupel_from_idx( i_cell, tupel, state.n_cells, 3 );
+        CPU_HELPER::tupel_from_idx( i_cell, tupel, state.n_cells, 3 ); // tupel now is {i, a, b, c}
         int a = tupel[0];
         int b = tupel[1];
         int c = tupel[2];
-        for( int i = 0; i < state.n_cell_atoms; i++ )
+
+        for( int i_basis = 0; i_basis < state.n_cell_atoms; i_basis++ )
         {
-            int idx_i = i + state.n_cell_atoms * ( i_cell );
-            for( int p = 0; p < state.N_pair; p++ )
+            int idx_i = i_basis + state.n_cell_atoms * ( i_cell );
+
+            // Allocate data for interacting spins
+            Vector3 interaction_spins[N];
+
+            for( int p = 0; p < N_Stencil; p++ )
             {
-                const Pair_Stencil & pair = state.pair_stencils[p];
-                int idx_j                 = pair.j + state.n_cell_atoms * ( ( a + pair.da ) + Na * ( b + pair.db + Nc * ( c + pair.dc ) ) );
-                if( i == pair.i && idx_j > 0 && idx_j < state.nos )
+                Stencil & stencil = stencils[p];
+                if( stencil.get_i() == i_basis )
                 {
-                    state.gradient[idx_i] += pair.matrix * state.spins[idx_j];
+                    for( int idx_interaction = 0; idx_interaction < N; idx_interaction++ )
+                    {
+                        int idx_j
+                            = stencil.get_j( idx_interaction )
+                              + state.n_cell_atoms * ( ( a + stencil.get_da( idx_interaction ) ) + Na * ( b + stencil.get_db( idx_interaction ) + Nb * ( c + stencil.get_dc( idx_interaction ) ) ) );
+                        if( idx_j >= 0 && idx_j < state.nos )
+                        {
+                            interaction_spins[idx_interaction] = state.spins[idx_j];
+                        }
+                        else
+                        {
+                            interaction_spins[idx_interaction] = { 0, 0, 0 };
+                        }
+                    }
+                    state.gradient[idx_i] += stencil.gradient( state.spins[idx_i], interaction_spins );
                 }
             }
         }
     }
 }
 
-void propagate_spins( Backend_Handle & state )
+void propagate_spins( Device_State state )
 {
 #pragma omp parallel for
     for( int idx = 0; idx < state.nos; idx++ )
@@ -65,20 +83,20 @@ void propagate_spins( Backend_Handle & state )
     }
 }
 
-void iterate( State & state, int N_iterations )
+void iterate( Host_State & state, int N_iterations )
 {
     for( int iter = 0; iter < N_iterations; iter++ )
     {
-        gradient( *state.backend );
-        propagate_spins( *state.backend );
-        if( iter % state.n_log == 0 )
+        stencil_gradient<1, ED_Stencil>( state.device_state, state.device_state.ed_stencils, state.device_state.n_ed );
+        propagate_spins( state.device_state );
+        if( iter % 100 == 0 )
         {
             printf( "iter = %i\n", iter );
-            state.backend->Download( state );
+            state.Download();
             std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
         }
     }
-    state.backend->Download( state );
+    state.Download();
 }
 
 #endif
