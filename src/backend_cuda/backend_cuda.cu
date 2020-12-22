@@ -109,6 +109,40 @@ __global__ void stencil_gradient( Device_State state, Stencil * stencils, int N_
     }
 }
 
+// template for singe spin stencils (because size 0 plain arrays are not allowed)
+template<typename Stencil>
+__global__ void stencil_gradient( Device_State state, Stencil * stencils, int N_Stencil )
+{
+    int index  = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+
+    int Na = state.n_cells[0];
+    int Nb = state.n_cells[1];
+    // int Nc = state.n_cells[2]; Not needed
+
+    for( int i_cell = index; i_cell < state.n_cells_total; i_cell += stride )
+    {
+        int tupel[3];
+        CUDA_HELPER::cu_tupel_from_idx( i_cell, tupel, state.n_cells, 3 ); // tupel now is {i, a, b, c}
+        int a = tupel[0];
+        int b = tupel[1];
+        int c = tupel[2];
+
+        for( int i_basis = 0; i_basis < state.n_cell_atoms; i_basis++ )
+        {
+            int idx_i = i_basis + state.n_cell_atoms * ( i_cell );
+            for( int p = 0; p < N_Stencil; p++ )
+            {
+                Stencil & stencil = stencils[p];
+                if( stencil.get_i() == i_basis )
+                {
+                    state.gradient[idx_i] += stencil.gradient( state.spins[idx_i], {} );
+                }
+            }
+        }
+    }
+}
+
 __global__ void propagate_spins( Device_State state )
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
