@@ -12,10 +12,10 @@ class Host_State
 {
 public:
     // Host Stack memory
+    std::array<int, 3> n_cells;
     int nos;
     int n_cell_atoms;
     int n_cells_total;
-    std::array<int, 3> n_cells;
     scalar timestep = 1e-3;
 
     // Host Heap memory

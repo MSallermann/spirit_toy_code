@@ -28,11 +28,14 @@ void set_gradient_zero( Device_State state )
 }
 
 template<int N, typename Stencil>
-void stencil_gradient( Device_State state, Stencil * stencils, int N_Stencil )
+void stencil_gradient( Device_State state )
 {
     int Na = state.n_cells[0];
     int Nb = state.n_cells[1];
     // int Nc = state.n_cells[2]; Not needed
+
+    auto N_Stencil = get_n_stencil<Stencil>( state );
+    auto stencils  = get_stencils<Stencil>( state );
 
 #pragma omp parallel for
     for( int i_cell = 0; i_cell < state.n_cells_total; i_cell++ )
@@ -91,7 +94,7 @@ void iterate( Host_State & state, int N_iterations )
     for( int iter = 0; iter < N_iterations; iter++ )
     {
         set_gradient_zero( state.device_state );
-        stencil_gradient<1, ED_Stencil>( state.device_state, state.device_state.ed_stencils, state.device_state.n_ed );
+        stencil_gradient<1, ED_Stencil>( state.device_state );
 
         propagate_spins( state.device_state );
         if( iter % 250 == 0 )
