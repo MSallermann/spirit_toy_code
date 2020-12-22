@@ -5,8 +5,18 @@
 
 #ifdef BACKEND_CPU
 using scalar = double;
-#else
+#else // BACKEND_CUDA
 using scalar = float;
+#endif
+
+#ifdef __CUDACC__
+#define HD_ATTRIBUTE __host__ __device__
+#define D_ATTRIBUTE __device__
+#define H_ATTRIBUTE __host__
+#else
+#define HD_ATTRIBUTE
+#define D_ATTRIBUTE
+#define H_ATTRIBUTE
 #endif
 
 using Matrix3 = Eigen::Matrix<scalar, 3, 3>;

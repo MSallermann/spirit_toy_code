@@ -1,3 +1,4 @@
+#include "Host_State.hpp"
 #include "backend.hpp"
 #include <chrono>
 #include <iostream>
@@ -23,22 +24,18 @@ int main( int argc, char * argv[] )
     printf( "Using Na = %i, Nb = %i, Nc = %i, Nbasis = %i, Niteration(s) = %i\n", cmd_args[0], cmd_args[1], cmd_args[2], cmd_args[3], cmd_args[4] );
     std::cout << "Backend: " << description() << "\n";
 
-    State state = State( { Na, Nb, Nc }, Nbasis, 1e-3 );
-
-    std::vector<Pair_Stencil> stencils;
+    std::vector<ED_Stencil> stencils;
 
     Matrix3 matrix;
     matrix << 1, 0, 1, 0, 1, 0, -1, 0, 1;
+    stencils.push_back( ED_Stencil( 0, { 0 }, { 1 }, { 0 }, { 0 }, matrix ) );
+    stencils.push_back( ED_Stencil( 0, { 0 }, { -1 }, { 0 }, { 0 }, matrix ) );
+    stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { 1 }, { 0 }, matrix ) );
+    stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { -1 }, { 0 }, matrix ) );
+    stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { 0 }, { 1 }, matrix ) );
+    stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { 0 }, { -1 }, matrix ) );
 
-    stencils.push_back( Pair_Stencil( 0, 0, 1, 0, 0, matrix ) );
-    stencils.push_back( Pair_Stencil( 0, 0, -1, 0, 0, matrix ) );
-    stencils.push_back( Pair_Stencil( 0, 0, 0, 1, 0, matrix ) );
-    stencils.push_back( Pair_Stencil( 0, 0, 0, -1, 0, matrix ) );
-    stencils.push_back( Pair_Stencil( 0, 0, 0, 0, 1, matrix ) );
-    stencils.push_back( Pair_Stencil( 0, 0, 0, 0, -1, matrix ) );
-
-    state.Set_Pair_Stencils( stencils );
-
+    Host_State state( { Na, Nb, Nc }, Nbasis, stencils );
     state.Set_Domain( { 2, 2, 2 } );
 
     std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";

@@ -25,7 +25,6 @@ struct Backend_Handle
     int nos;
     scalar timestep;
     Vector3 * gradient = nullptr;
-    // State * state;
 };
 
 #endif

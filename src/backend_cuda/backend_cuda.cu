@@ -10,73 +10,130 @@ std::string description()
     return des;
 }
 
-__global__ void gradient( Backend_Handle * state )
+// __global__ void gradient( Device_State state )
+// {
+//     int index  = blockIdx.x * blockDim.x + threadIdx.x;
+//     int stride = blockDim.x * gridDim.x;
+
+//     int Na            = state.n_cells[0];
+//     int Nb            = state.n_cells[1];
+//     int Nc            = state.n_cells[2];
+//     int N_cells_total = Na * Nb * Nc;
+
+//     for( int i = index; i < state.nos; i += stride )
+//     {
+//         state.gradient[i] = { 0, 0, 0 };
+//     }
+
+//     for( int i_cell = index; i_cell < N_cells_total; i_cell += stride )
+//     {
+//         int tupel[3];
+//         CUDA_HELPER::cu_tupel_from_idx( i_cell, tupel, state.n_cells, 3 ); // tupel now is {i, a, b, c}
+//         int a = tupel[0];
+//         int b = tupel[1];
+//         int c = tupel[2];
+//         for( int i = 0; i < state.n_cell_atoms; i++ )
+//         {
+//             int idx_i = i + state.n_cell_atoms * ( i_cell );
+//             for( int p = 0; p < state.N_pair; p++ )
+//             {
+//                 const Pair_Stencil & pair = state.pair_stencils[p];
+//                 int idx_j                 = pair.j + state.n_cell_atoms * ( ( a + pair.da ) + Na * ( b + pair.db + Nc * ( c + pair.dc ) ) );
+//                 if( i == pair.i && idx_j > 0 && idx_j < state.nos )
+//                 {
+//                     state.gradient[idx_i] += pair.matrix * state.spins[idx_j];
+//                 }
+//             }
+//         }
+//     }
+// }
+
+template<int N, typename Stencil>
+__global__ void stencil_gradient( Device_State state, Stencil * stencils, int N_Stencil )
 {
+
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
-    int Na            = state->n_cells[0];
-    int Nb            = state->n_cells[1];
-    int Nc            = state->n_cells[2];
-    int N_cells_total = Na * Nb * Nc;
+    int Na = state.n_cells[0];
+    int Nb = state.n_cells[1];
+    // int Nc = state.n_cells[2]; Not needed
 
-    for( int i = index; i < state->nos; i += stride )
+    for( int i = index; i < state.nos; i += stride )
     {
-        state->gradient[i] = { 0, 0, 0 };
+        state.gradient[i] = { 0, 0, 0 };
     }
-
-    for( int i_cell = index; i_cell < N_cells_total; i_cell += stride )
+    // return;
+    for( int i_cell = index; i_cell < state.n_cells_total; i_cell += stride )
     {
         int tupel[3];
-        Cuda_Backend::cu_tupel_from_idx( i_cell, tupel, state->n_cells, 3 ); // tupel now is {i, a, b, c}
+        CUDA_HELPER::cu_tupel_from_idx( i_cell, tupel, state.n_cells, 3 ); // tupel now is {i, a, b, c}
         int a = tupel[0];
         int b = tupel[1];
         int c = tupel[2];
-        for( int i = 0; i < state->n_cell_atoms; i++ )
+
+        for( int i_basis = 0; i_basis < state.n_cell_atoms; i_basis++ )
         {
-            int idx_i = i + state->n_cell_atoms * ( i_cell );
-            for( int p = 0; p < state->N_pair; p++ )
+            int idx_i = i_basis + state.n_cell_atoms * ( i_cell );
+
+            // Allocate data for interacting spins
+            Vector3 interaction_spins[N];
+
+            for( int p = 0; p < N_Stencil; p++ )
             {
-                const Pair_Stencil & pair = state->pair_stencils[p];
-                int idx_j                 = pair.j + state->n_cell_atoms * ( ( a + pair.da ) + Na * ( b + pair.db + Nc * ( c + pair.dc ) ) );
-                if( i == pair.i && idx_j > 0 && idx_j < state->nos )
+                Stencil & stencil = stencils[p];
+                if( stencil.get_i() == i_basis )
                 {
-                    state->gradient[idx_i] += pair.matrix * state->spins[idx_j];
+                    for( int idx_interaction = 0; idx_interaction < N; idx_interaction++ )
+                    {
+                        int idx_j
+                            = stencil.get_j( idx_interaction )
+                              + state.n_cell_atoms * ( ( a + stencil.get_da( idx_interaction ) ) + Na * ( b + stencil.get_db( idx_interaction ) + Nb * ( c + stencil.get_dc( idx_interaction ) ) ) );
+                        if( idx_j >= 0 && idx_j < state.nos )
+                        {
+                            interaction_spins[idx_interaction] = state.spins[idx_j];
+                        }
+                        else
+                        {
+                            interaction_spins[idx_interaction] = { 0, 0, 0 };
+                        }
+                    }
+                    state.gradient[idx_i] += stencil.gradient( state.spins[idx_i], interaction_spins );
                 }
             }
         }
     }
 }
 
-__global__ void propagate_spins( Backend_Handle * state )
+__global__ void propagate_spins( Device_State state )
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
-    for( int idx = index; idx < state->nos; idx += stride )
+    for( int idx = index; idx < state.nos; idx += stride )
     {
-        state->spins[idx] += state->timestep * state->gradient[idx];
-        state->spins[idx].normalize();
+        state.spins[idx] += state.timestep * state.gradient[idx];
+        state.spins[idx].normalize();
     }
 }
 
-void iterate( State & state, int N_iterations )
+void iterate( Host_State & state, int N_iterations )
 {
     int blockSize = 1024;
-    int numBlocks = ( state.Nos() + blockSize - 1 ) / blockSize;
+    int numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
 
     for( int iter = 0; iter < N_iterations; iter++ )
     {
-        gradient<<<numBlocks, blockSize>>>( state.backend->dev_ptr );
-        propagate_spins<<<numBlocks, blockSize>>>( state.backend->dev_ptr );
-        if( iter % state.n_log == 0 )
+        stencil_gradient<1, ED_Stencil><<<numBlocks, blockSize>>>( state.device_state, state.device_state.ed_stencils, state.device_state.n_ed );
+        propagate_spins<<<numBlocks, blockSize>>>( state.device_state );
+        if( iter % 100 == 0 )
         {
             printf( "iter = %i\n", iter );
-            state.backend->Download( state );
+            state.Download();
             std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
         }
     }
     cudaDeviceSynchronize();
-    state.backend->Download( state );
+    state.Download();
 }
 
 #endif
