@@ -4,7 +4,17 @@
 #include "Hamiltonian.hpp"
 #include "definitions.hpp"
 
+namespace Spirit
+{
+
+namespace Host
+{
 class Host_State;
+}
+
+namespace Device
+{
+
 struct Device_State
 {
     bool allocated = false;
@@ -26,9 +36,9 @@ struct Device_State
     int n_k;
     K_Stencil * k_stencils;
 
-    void H_ATTRIBUTE allocate( Host_State * host_state );
-    void H_ATTRIBUTE upload( Host_State * host_state );
-    void H_ATTRIBUTE download( Host_State * host_state );
+    void H_ATTRIBUTE allocate( Spirit::Host::Host_State * host_state );
+    void H_ATTRIBUTE upload( Spirit::Host::Host_State * host_state );
+    void H_ATTRIBUTE download( Spirit::Host::Host_State * host_state );
     void H_ATTRIBUTE free();
 };
 
@@ -87,4 +97,6 @@ inline D_ATTRIBUTE Stencil * get_stencils( Device_State & state )
     return (Stencil *)__get_stencils<Stencil>( state );
 }
 
+} // namespace Device
+} // namespace Spirit
 #endif

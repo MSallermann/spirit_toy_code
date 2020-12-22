@@ -4,7 +4,12 @@
 #include "Host_State.hpp"
 #include "backend_cuda/cuda_helper_functions.hpp"
 
-void Device_State::allocate( Host_State * host_state )
+namespace Spirit
+{
+namespace Device
+{
+
+void Device_State::allocate( Spirit::Host::Host_State * host_state )
 {
     this->free();
     allocated = true;
@@ -30,13 +35,13 @@ void Device_State::allocate( Host_State * host_state )
     CUDA_HELPER::malloc_n( this->b_stencils, host_state->b_stencils.size() );
 }
 
-void Device_State::download( Host_State * host_state )
+void Device_State::download( Spirit::Host::Host_State * host_state )
 {
     CUDA_HELPER::copy_vector_D2H( host_state->spins, this->spins );
     CUDA_HELPER::copy_vector_D2H( host_state->gradient, this->gradient );
 }
 
-void Device_State::upload( Host_State * host_state )
+void Device_State::upload( Spirit::Host::Host_State * host_state )
 {
     CUDA_HELPER::copy_vector_H2D( this->spins, host_state->spins );
     CUDA_HELPER::copy_vector_H2D( this->ed_stencils, host_state->ed_stencils );
@@ -55,4 +60,6 @@ void Device_State::free()
     CUDA_HELPER::free( ed_stencils );
 }
 
+} // namespace Device
+} // namespace Spirit
 #endif

@@ -3,6 +3,11 @@
 #include "backend_cuda/cuda_helper_functions.hpp"
 #include <iostream>
 
+namespace Spirit
+{
+namespace Device
+{
+
 std::string description()
 {
     std::string des;
@@ -112,7 +117,7 @@ __global__ void propagate_spins( Device_State state )
     }
 }
 
-void iterate( Host_State & state, int N_iterations )
+void iterate( Spirit::Host::Host_State & state, int N_iterations )
 {
     int blockSize = 1024;
     int numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
@@ -147,4 +152,6 @@ void iterate( Host_State & state, int N_iterations )
     state.Download();
 }
 
+} // namespace Device
+} // namespace Spirit
 #endif

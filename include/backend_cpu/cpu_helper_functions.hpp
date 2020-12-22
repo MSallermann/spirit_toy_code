@@ -1,8 +1,13 @@
 #pragma once
 #ifndef CPU_HELPER_FUNCTIONS
 
+namespace Spirit
+{
+namespace Device
+{
 namespace CPU_HELPER
 {
+
 inline void tupel_from_idx( int & idx, int * tupel, int * maxVal, int n )
 {
     int idx_diff = idx;
@@ -17,5 +22,8 @@ inline void tupel_from_idx( int & idx, int * tupel, int * maxVal, int n )
     }
     tupel[0] = idx_diff / div;
 }
+
 } // namespace CPU_HELPER
+} // namespace Device
+} // namespace Spirit
 #endif

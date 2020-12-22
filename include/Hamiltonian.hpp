@@ -2,6 +2,8 @@
 #ifndef HAMILTONIAN_HPP
 #define HAMILTONIAN_HPP
 #include "Stencil.hpp"
+namespace Spirit
+{
 
 struct ED_Stencil : Stencil<1, Matrix3>
 {
@@ -54,4 +56,5 @@ struct K_Stencil : Stencil<0, Vector3>
     }
 };
 
+} // namespace Spirit
 #endif

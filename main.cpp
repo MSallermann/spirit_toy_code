@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 
+using namespace Spirit;
 constexpr int N_iterations = 500;
 
 int main( int argc, char * argv[] )
@@ -22,7 +23,7 @@ int main( int argc, char * argv[] )
     }
     int Na = cmd_args[0], Nb = cmd_args[1], Nc = cmd_args[2], Nbasis = cmd_args[3], N_iterations = cmd_args[4];
     printf( "Using Na = %i, Nb = %i, Nc = %i, Nbasis = %i, Niteration(s) = %i\n", cmd_args[0], cmd_args[1], cmd_args[2], cmd_args[3], cmd_args[4] );
-    std::cout << "Backend: " << description() << "\n";
+    std::cout << "Backend: " << Device::description() << "\n";
 
     std::vector<ED_Stencil> stencils;
 
@@ -42,14 +43,14 @@ int main( int argc, char * argv[] )
     std::vector<Bfield_Stencil> b_stencils;
     b_stencils.push_back( Bfield_Stencil( 0, {}, {}, {}, {}, vec ) );
 
-    Host_State state( { Na, Nb, Nc }, Nbasis, stencils, k_stencils, b_stencils );
+    Host::Host_State state( { Na, Nb, Nc }, Nbasis, stencils, k_stencils, b_stencils );
     state.Set_Domain( { 2, 2, 2 } );
 
     std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
     std::cout << "Sart Iterations\n";
 
     auto start = std::chrono::high_resolution_clock::now();
-    iterate( state, N_iterations );
+    Device::iterate( state, N_iterations );
     auto end = std::chrono::high_resolution_clock::now();
 
     std::cout << "End Iterations\n";

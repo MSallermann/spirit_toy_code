@@ -19,6 +19,9 @@ using scalar = float;
 #define H_ATTRIBUTE
 #endif
 
+namespace Spirit
+{
+
 using Matrix3 = Eigen::Matrix<scalar, 3, 3>;
 using Vector3 = Eigen::Matrix<scalar, 3, 1>;
 
@@ -46,4 +49,5 @@ inline void debug_print( T msg )
 #endif
 }
 
+} // namespace Spirit
 #endif

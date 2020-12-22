@@ -3,7 +3,12 @@
 #include "Device_State.hpp"
 #include "Host_State.hpp"
 
-void Device_State::allocate( Host_State * host_state )
+namespace Spirit
+{
+namespace Device
+{
+
+void Device_State::allocate( Spirit::Host::Host_State * host_state )
 {
     this->free();
     allocated = true;
@@ -27,12 +32,12 @@ void Device_State::allocate( Host_State * host_state )
     this->b_stencils  = host_state->b_stencils.data();
 }
 
-void Device_State::download( Host_State * host_state )
+void Device_State::download( Spirit::Host::Host_State * host_state )
 {
     return;
 }
 
-void Device_State::upload( Host_State * host_state )
+void Device_State::upload( Spirit::Host::Host_State * host_state )
 {
     return;
 }
@@ -42,4 +47,6 @@ void Device_State::free()
     return;
 }
 
+} // namespace Device
+} // namespace Spirit
 #endif

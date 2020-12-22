@@ -8,6 +8,10 @@
 #include <memory>
 #include <vector>
 
+namespace Spirit
+{
+namespace Host
+{
 class Host_State
 {
 public:
@@ -25,7 +29,7 @@ public:
     std::vector<K_Stencil> k_stencils;
     std::vector<Bfield_Stencil> b_stencils;
 
-    Device_State device_state;
+    Spirit::Device::Device_State device_state;
 
     Host_State( std::array<int, 3> n_cells, int n_cell_atoms, const std::vector<ED_Stencil> & ed_stencils, const std::vector<K_Stencil> & k_stencils, const std::vector<Bfield_Stencil> & b_stencils )
             : n_cells( n_cells ), n_cell_atoms( n_cell_atoms ), ed_stencils( ed_stencils ), k_stencils( k_stencils ), b_stencils( b_stencils )
@@ -90,5 +94,6 @@ public:
         device_state.free();
     }
 };
-
+} // namespace Host
+} // namespace Spirit
 #endif

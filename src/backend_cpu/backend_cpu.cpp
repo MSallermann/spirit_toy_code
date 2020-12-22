@@ -7,6 +7,11 @@
 #include "omp.h"
 #endif
 
+namespace Spirit
+{
+namespace Device
+{
+
 std::string description()
 {
     std::string des;
@@ -89,7 +94,7 @@ void propagate_spins( Device_State state )
     }
 }
 
-void iterate( Host_State & state, int N_iterations )
+void iterate( Spirit::Host::Host_State & state, int N_iterations )
 {
     for( int iter = 0; iter < N_iterations; iter++ )
     {
@@ -109,4 +114,6 @@ void iterate( Host_State & state, int N_iterations )
     state.Download();
 }
 
+} // namespace Device
+} // namespace Spirit
 #endif

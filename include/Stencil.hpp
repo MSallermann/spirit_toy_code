@@ -3,6 +3,9 @@
 #define STENCIL_HPP
 #include "definitions.hpp"
 
+namespace Spirit
+{
+
 template<int N, typename PARAM>
 struct Stencil
 {
@@ -66,4 +69,5 @@ struct Stencil
     };
 };
 
+} // namespace Spirit
 #endif
