@@ -126,11 +126,6 @@ struct Stencil
         return energy( spin, interaction_spins );
     };
 
-    int product( int u, int v )
-    {
-        return u * v;
-    }
-
     STATE_ATTRIBUTE
     int get_i()
     {
@@ -179,7 +174,7 @@ struct ED_Stencil : Stencil<1, Matrix3>
     }
 };
 
-struct Backend_State
+struct Device_State
 {
     bool allocated = false;
     int nos;
@@ -221,8 +216,8 @@ public:
     std::vector<Vector3> gradient;
     std::vector<ED_Stencil> ed_stencils;
 
-    // Device pointer to backend_state
-    Backend_State backend_state;
+    // Device pointer to device_state
+    Device_State device_state;
 
     Host_State( std::array<int, 3> n_cells, int n_cell_atoms, const std::vector<ED_Stencil> & ed_stencils ) : n_cells( n_cells ), n_cell_atoms( n_cell_atoms ), ed_stencils( ed_stencils )
     {
@@ -247,51 +242,50 @@ public:
 
     void Download()
     {
-        copy_vector_D2H( spins, backend_state.spins );
-        copy_vector_D2H( gradient, backend_state.gradient );
+        copy_vector_D2H( spins, device_state.spins );
+        copy_vector_D2H( gradient, device_state.gradient );
     }
 
     void Upload()
     {
-        copy_vector_H2D( backend_state.spins, spins );
-        copy_vector_H2D( backend_state.ed_stencils, ed_stencils );
+        copy_vector_H2D( device_state.spins, spins );
+        copy_vector_H2D( device_state.ed_stencils, ed_stencils );
     }
 
     void Allocate_GPU_Backend()
     {
-        backend_state.free();
-        backend_state               = Backend_State();
-        backend_state.allocated     = true;
-        backend_state.nos           = nos;
-        backend_state.n_cells_total = n_cells_total;
-        backend_state.n_cell_atoms  = n_cell_atoms;
-        backend_state.n_cells[0]    = n_cells[0];
-        backend_state.n_cells[1]    = n_cells[1];
-        backend_state.n_cells[2]    = n_cells[2];
-        backend_state.n_ed          = ed_stencils.size();
-        backend_state.timestep      = timestep;
-        malloc_n( backend_state.gradient, nos );
-        malloc_n( backend_state.spins, nos );
-        malloc_n( backend_state.ed_stencils, ed_stencils.size() );
+        device_state.free();
+        device_state               = Device_State();
+        device_state.allocated     = true;
+        device_state.nos           = nos;
+        device_state.n_cells_total = n_cells_total;
+        device_state.n_cell_atoms  = n_cell_atoms;
+        device_state.n_cells[0]    = n_cells[0];
+        device_state.n_cells[1]    = n_cells[1];
+        device_state.n_cells[2]    = n_cells[2];
+        device_state.n_ed          = ed_stencils.size();
+        device_state.timestep      = timestep;
+        malloc_n( device_state.gradient, nos );
+        malloc_n( device_state.spins, nos );
+        malloc_n( device_state.ed_stencils, ed_stencils.size() );
     }
 
     ~Host_State()
     {
-        backend_state.free();
+        device_state.free();
     }
 };
 
 template<int N, typename Stencil>
-__global__ void stencil_gradient( Backend_State state, Stencil * stencils, int N_Stencil )
+__global__ void stencil_gradient( Device_State state, Stencil * stencils, int N_Stencil )
 {
 
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
-    int Na            = state.n_cells[0];
-    int Nb            = state.n_cells[1];
-    int Nc            = state.n_cells[2];
-    int N_cells_total = Na * Nb * Nc;
+    int Na = state.n_cells[0];
+    int Nb = state.n_cells[1];
+    // int Nc = state.n_cells[2]; Not needed
 
     for( int i = index; i < state.nos; i += stride )
     {
@@ -322,7 +316,7 @@ __global__ void stencil_gradient( Backend_State state, Stencil * stencils, int N
                     {
                         int idx_j
                             = stencil.get_j( idx_interaction )
-                              + state.n_cell_atoms * ( ( a + stencil.get_da( idx_interaction ) ) + Na * ( b + stencil.get_db( idx_interaction ) + Nc * ( c + stencil.get_dc( idx_interaction ) ) ) );
+                              + state.n_cell_atoms * ( ( a + stencil.get_da( idx_interaction ) ) + Na * ( b + stencil.get_db( idx_interaction ) + Nb * ( c + stencil.get_dc( idx_interaction ) ) ) );
                         if( idx_j >= 0 && idx_j < state.nos )
                         {
                             interaction_spins[idx_interaction] = state.spins[idx_j];
@@ -339,7 +333,7 @@ __global__ void stencil_gradient( Backend_State state, Stencil * stencils, int N
     }
 }
 
-__global__ void propagate_spins( Backend_State state )
+__global__ void propagate_spins( Device_State state )
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
@@ -359,8 +353,8 @@ void iterate( Host_State & state, int N_iterations )
 
     for( int iter = 0; iter < N_iterations; iter++ )
     {
-        stencil_gradient<1, ED_Stencil><<<numBlocks, blockSize>>>( state.backend_state, state.backend_state.ed_stencils, state.backend_state.n_ed );
-        propagate_spins<<<numBlocks, blockSize>>>( state.backend_state );
+        stencil_gradient<1, ED_Stencil><<<numBlocks, blockSize>>>( state.device_state, state.device_state.ed_stencils, state.device_state.n_ed );
+        propagate_spins<<<numBlocks, blockSize>>>( state.device_state );
         if( iter % 100 == 0 )
         {
             printf( "iter = %i\n", iter );
@@ -388,11 +382,9 @@ int main( void )
     stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { 0 }, { 1 }, matrix ) );
     stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { 0 }, { -1 }, matrix ) );
 
-    int Na = 100, Nb = 100, Nc = 100, Nbasis = 1, N_iterations = 20000;
+    int Na = 100, Nb = 100, Nc = 100, Nbasis = 1, N_iterations = 200;
     Host_State state( { Na, Nb, Nc }, Nbasis, stencils );
     state.Set_Domain( { 2, 2, 2 } );
-    int blockSize = 1024;
-    int numBlocks = ( state.n_cells_total + blockSize - 1 ) / blockSize;
 
     printf( "Using Na = %i, Nb = %i, Nc = %i, Nbasis = %i, Niteration(s) = %i\n", Na, Nb, Nc, Nbasis, N_iterations );
     std::cout << "Sart Iterations\n";
@@ -405,5 +397,5 @@ int main( void )
     std::cout << "Elapsed time: " << elapsed_seconds.count() * 1e3 << " ms (" << N_iterations << " iterations)\n";
     std::cout << "              " << elapsed_seconds.count() / N_iterations * 1e3 << " ms per iteration\n";
     std::cout << "              " << N_iterations / elapsed_seconds.count() << " iterations per second\n";
-    // stencil_gradient<<<blockSize, numBlocks>>>( state.backend_state, state.backend_state->ed_stencils, state.backend_state->n_ED );
+    // stencil_gradient<<<blockSize, numBlocks>>>( state.device_state, state.device_state->ed_stencils, state.device_state->n_ED );
 };
