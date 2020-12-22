@@ -117,13 +117,22 @@ void iterate( Host_State & state, int N_iterations )
     int blockSize = 1024;
     int numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
 
+    Bfield_Stencil b( 0, {}, {}, {}, {}, { 0, 1, 0 } );
+    Bfield_Stencil * b_dev_ptr;
+
+    CUDA_HELPER::malloc_n( b_dev_ptr, 1 );
+    CUDA_HELPER::copy_H2D( b_dev_ptr, &b );
+
     for( int iter = 0; iter < N_iterations; iter++ )
     {
         numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
         set_gradient_zero<<<numBlocks, blockSize>>>( state.device_state );
 
         numBlocks = ( state.n_cells_total + blockSize - 1 ) / blockSize;
-        stencil_gradient<1, ED_Stencil><<<numBlocks, blockSize>>>( state.device_state, state.device_state.ed_stencils, state.device_state.n_ed );
+
+        stencil_gradient<1, ED_Stencil><<<numBlocks, blockSize>>>( state.device_state );
+        stencil_gradient<Bfield_Stencil><<<numBlocks, blockSize>>>( state.device_state );
+        stencil_gradient<K_Stencil><<<numBlocks, blockSize>>>( state.device_state );
 
         numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
         propagate_spins<<<numBlocks, blockSize>>>( state.device_state );

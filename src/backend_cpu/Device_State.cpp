@@ -16,11 +16,15 @@ void Device_State::allocate( Host_State * host_state )
     this->n_cells[1]    = host_state->n_cells[1];
     this->n_cells[2]    = host_state->n_cells[2];
     this->n_ed          = host_state->ed_stencils.size();
+    this->n_k           = host_state->k_stencils.size();
+    this->n_b           = host_state->b_stencils.size();
     this->timestep      = host_state->timestep;
 
     this->gradient    = host_state->gradient.data();
     this->spins       = host_state->spins.data();
     this->ed_stencils = host_state->ed_stencils.data();
+    this->k_stencils  = host_state->k_stencils.data();
+    this->b_stencils  = host_state->b_stencils.data();
 }
 
 void Device_State::download( Host_State * host_state )

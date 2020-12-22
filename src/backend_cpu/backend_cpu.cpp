@@ -95,6 +95,8 @@ void iterate( Host_State & state, int N_iterations )
     {
         set_gradient_zero( state.device_state );
         stencil_gradient<1, ED_Stencil>( state.device_state );
+        stencil_gradient<0, K_Stencil>( state.device_state );
+        stencil_gradient<0, Bfield_Stencil>( state.device_state );
 
         propagate_spins( state.device_state );
         if( iter % 250 == 0 )

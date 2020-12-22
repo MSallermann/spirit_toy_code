@@ -20,6 +20,12 @@ struct Device_State
     int n_ed;
     ED_Stencil * ed_stencils;
 
+    int n_b;
+    Bfield_Stencil * b_stencils;
+
+    int n_k;
+    K_Stencil * k_stencils;
+
     void H_ATTRIBUTE allocate( Host_State * host_state );
     void H_ATTRIBUTE upload( Host_State * host_state );
     void H_ATTRIBUTE download( Host_State * host_state );
@@ -33,12 +39,6 @@ inline D_ATTRIBUTE int get_n_stencil( Device_State & state ) // Default
     return -1;
 };
 
-template<>
-inline D_ATTRIBUTE int get_n_stencil<ED_Stencil>( Device_State & state )
-{
-    return state.n_ed;
-};
-
 template<typename Stencil>
 inline D_ATTRIBUTE void * __get_stencils( Device_State & state )
 {
@@ -46,9 +46,39 @@ inline D_ATTRIBUTE void * __get_stencils( Device_State & state )
 }
 
 template<>
+inline D_ATTRIBUTE int get_n_stencil<ED_Stencil>( Device_State & state )
+{
+    return state.n_ed;
+};
+
+template<>
 inline D_ATTRIBUTE void * __get_stencils<ED_Stencil>( Device_State & state )
 {
     return (void *)state.ed_stencils;
+}
+
+template<>
+inline D_ATTRIBUTE int get_n_stencil<K_Stencil>( Device_State & state )
+{
+    return state.n_k;
+};
+
+template<>
+inline D_ATTRIBUTE void * __get_stencils<K_Stencil>( Device_State & state )
+{
+    return (void *)state.k_stencils;
+}
+
+template<>
+inline D_ATTRIBUTE int get_n_stencil<Bfield_Stencil>( Device_State & state )
+{
+    return state.n_b;
+};
+
+template<>
+inline D_ATTRIBUTE void * __get_stencils<Bfield_Stencil>( Device_State & state )
+{
+    return (void *)state.b_stencils;
 }
 
 template<typename Stencil>

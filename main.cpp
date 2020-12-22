@@ -35,7 +35,14 @@ int main( int argc, char * argv[] )
     stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { 0 }, { 1 }, matrix ) );
     stencils.push_back( ED_Stencil( 0, { 0 }, { 0 }, { 0 }, { -1 }, matrix ) );
 
-    Host_State state( { Na, Nb, Nc }, Nbasis, stencils );
+    Vector3 vec = Vector3::Identity();
+    std::vector<K_Stencil> k_stencils;
+    k_stencils.push_back( K_Stencil( 0, {}, {}, {}, {}, vec ) );
+
+    std::vector<Bfield_Stencil> b_stencils;
+    b_stencils.push_back( Bfield_Stencil( 0, {}, {}, {}, {}, vec ) );
+
+    Host_State state( { Na, Nb, Nc }, Nbasis, stencils, k_stencils, b_stencils );
     state.Set_Domain( { 2, 2, 2 } );
 
     std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";

@@ -16,11 +16,18 @@ void Device_State::allocate( Host_State * host_state )
     this->n_cells[0]    = host_state->n_cells[0];
     this->n_cells[1]    = host_state->n_cells[1];
     this->n_cells[2]    = host_state->n_cells[2];
-    this->n_ed          = host_state->ed_stencils.size();
-    this->timestep      = host_state->timestep;
+
+    this->n_ed = host_state->ed_stencils.size();
+    this->n_k  = host_state->k_stencils.size();
+    this->n_b  = host_state->b_stencils.size();
+
+    this->timestep = host_state->timestep;
     CUDA_HELPER::malloc_n( this->gradient, host_state->nos );
     CUDA_HELPER::malloc_n( this->spins, host_state->nos );
+
     CUDA_HELPER::malloc_n( this->ed_stencils, host_state->ed_stencils.size() );
+    CUDA_HELPER::malloc_n( this->k_stencils, host_state->k_stencils.size() );
+    CUDA_HELPER::malloc_n( this->b_stencils, host_state->b_stencils.size() );
 }
 
 void Device_State::download( Host_State * host_state )
@@ -33,6 +40,8 @@ void Device_State::upload( Host_State * host_state )
 {
     CUDA_HELPER::copy_vector_H2D( this->spins, host_state->spins );
     CUDA_HELPER::copy_vector_H2D( this->ed_stencils, host_state->ed_stencils );
+    CUDA_HELPER::copy_vector_H2D( this->k_stencils, host_state->k_stencils );
+    CUDA_HELPER::copy_vector_H2D( this->b_stencils, host_state->b_stencils );
 }
 
 void Device_State::free()
