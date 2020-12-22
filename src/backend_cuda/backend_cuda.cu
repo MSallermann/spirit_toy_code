@@ -48,10 +48,19 @@ std::string description()
 //     }
 // }
 
+__global__ void set_gradient_zero( Device_State state )
+{
+    int index  = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+    for( int i = index; i < state.nos; i += stride )
+    {
+        state.gradient[i] = { 0, 0, 0 };
+    }
+}
+
 template<int N, typename Stencil>
 __global__ void stencil_gradient( Device_State state, Stencil * stencils, int N_Stencil )
 {
-
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
 
@@ -59,11 +68,6 @@ __global__ void stencil_gradient( Device_State state, Stencil * stencils, int N_
     int Nb = state.n_cells[1];
     // int Nc = state.n_cells[2]; Not needed
 
-    for( int i = index; i < state.nos; i += stride )
-    {
-        state.gradient[i] = { 0, 0, 0 };
-    }
-    // return;
     for( int i_cell = index; i_cell < state.n_cells_total; i_cell += stride )
     {
         int tupel[3];
@@ -123,9 +127,15 @@ void iterate( Host_State & state, int N_iterations )
 
     for( int iter = 0; iter < N_iterations; iter++ )
     {
+        numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
+        set_gradient_zero<<<numBlocks, blockSize>>>( state.device_state );
+
+        numBlocks = ( state.n_cells_total + blockSize - 1 ) / blockSize;
         stencil_gradient<1, ED_Stencil><<<numBlocks, blockSize>>>( state.device_state, state.device_state.ed_stencils, state.device_state.n_ed );
+
+        numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
         propagate_spins<<<numBlocks, blockSize>>>( state.device_state );
-        if( iter % 100 == 0 )
+        if( iter % 250 == 0 )
         {
             printf( "iter = %i\n", iter );
             state.Download();

@@ -18,18 +18,21 @@ std::string description()
     return des;
 }
 
+void set_gradient_zero( Device_State state )
+{
+#pragma omp parallel for
+    for( int i = 0; i < state.nos; i++ )
+    {
+        state.gradient[i] = { 0, 0, 0 };
+    }
+}
+
 template<int N, typename Stencil>
 void stencil_gradient( Device_State state, Stencil * stencils, int N_Stencil )
 {
     int Na = state.n_cells[0];
     int Nb = state.n_cells[1];
     // int Nc = state.n_cells[2]; Not needed
-
-#pragma omp parallel for
-    for( int i = 0; i < state.nos; i++ )
-    {
-        state.gradient[i] = { 0, 0, 0 };
-    }
 
 #pragma omp parallel for
     for( int i_cell = 0; i_cell < state.n_cells_total; i_cell++ )
@@ -87,9 +90,11 @@ void iterate( Host_State & state, int N_iterations )
 {
     for( int iter = 0; iter < N_iterations; iter++ )
     {
+        set_gradient_zero( state.device_state );
         stencil_gradient<1, ED_Stencil>( state.device_state, state.device_state.ed_stencils, state.device_state.n_ed );
+
         propagate_spins( state.device_state );
-        if( iter % 100 == 0 )
+        if( iter % 250 == 0 )
         {
             printf( "iter = %i\n", iter );
             state.Download();
