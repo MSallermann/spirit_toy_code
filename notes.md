@@ -3,12 +3,17 @@ Documenting my thinking process ...
 
 # Ideas
 - Should make the separation between host and device reflected in namespaces
-- Maybe one can abstract the methods and solvers into a series of "actions" wich would be started from the host and could be accelerated according to the used backend. This would make it possible to "compose" the methods form different actions, which are defined in the backend interface.
+- Maybe one can abstract the methods and solvers into a series of "actions" wich would be started from the host and could be accelerated according to the used backend. This would make it possible to "compose" the methods form different actions, which are defined in the backend interface. One action could be computing the energy gradient for example. 
+
+I made three namespaces: `Spirit`, `Spirit::Host` and `Spirit::Device`
+- In the `Spirit` namespace the logic of the methods and solvers should be implemented (using the abstract)
+- In the `Spirit::Device` namespace the implementation of the "actions" is
+- In the `Spirit::Host` namespace 
 
 # Things to still be implemented
-- [ ] energy calculation in mimizers
-- [ ] multiple solvers (maybe gradient descent and VP)
-- [ ] multiple methods (maybe energy minimisation and LLG)
+- [ ] energy calculation in minimizers
+- [ ] multiple solvers (maybe gradient descent and VP for a start)
+- [ ] multiple methods (maybe energy minimisation and LLG for a start)
 - [ ] dummy API with getters setters
 - [ ] Vulkan Backend
 
