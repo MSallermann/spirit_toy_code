@@ -34,16 +34,17 @@ endif()
 include( ChooseCompiler )
 project( spirit_toy_code )
 set(META_PROJECT_NAME "spirit")
+
 include( CompilerFlags )
 
 message( STATUS ">> Please check the CMAKE_CXX_COMPILER to make sure it's the right one" )
 message( STATUS ">> CMAKE_C_COMPILER:   ${CMAKE_C_COMPILER}" )
 message( STATUS ">> CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}" )
 
-if(NOT DEFINED CMAKE_CUDA_STANDARD)
-        set(CMAKE_CXX_STANDARD 11)
-        set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 set( SRC 
         ${PROJECT_SOURCE_DIR}/main.cpp

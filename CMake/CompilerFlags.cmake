@@ -17,7 +17,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         message(FATAL_ERROR "GCC version must be at least 5.1!")
     endif()
     ### Compiler Flags
-    set( CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -std=c++11 -Wall" )
+    set( CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall" )
     ### Linker Flags
     if (APPLE)
         set( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-no_compact_unwind" )
@@ -52,7 +52,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
     ### Message
     MESSAGE( STATUS ">> Chose compiler:                Intel" )
     ### Compiler Flags
-    set( CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -std=c++11" )
+    # set( CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -std=c++11" )
     ### Linker Flags
     if (APPLE)
         set( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-no_compact_unwind" )
