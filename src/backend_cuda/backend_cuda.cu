@@ -119,7 +119,8 @@ void iterate( Spirit::Host::Host_State & state, int N_iterations )
         {
             printf( "iter = %i\n", iter );
             state.Download();
-            std::cout << "Spin[0,0,0] = " << state.spins[0].transpose() << "\n";
+            std::cout << "    spin[0,0,0]     = " << state.spins[0].transpose() << "\n";
+            std::cout << "    gradient[0,0,0] = " << state.gradient[0].transpose() << "\n";
         }
     }
     cudaDeviceSynchronize();
