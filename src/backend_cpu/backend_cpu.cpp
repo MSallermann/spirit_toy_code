@@ -32,7 +32,7 @@ void set_gradient_zero( Device_State state )
     }
 }
 
-template<int N, typename Stencil>
+template<typename Stencil>
 void stencil_gradient( Device_State state )
 {
     int Na = state.n_cells[0];
@@ -56,28 +56,29 @@ void stencil_gradient( Device_State state )
             int idx_i = i_basis + state.n_cell_atoms * ( i_cell );
 
             // Allocate data for interacting spins
-            Vector3 interaction_spins[N];
+            Vector3 interaction_spins[Stencil::N_interaction];
+            interaction_spins[0] = state.spins[idx_i];
 
             for( int p = 0; p < N_Stencil; p++ )
             {
                 Stencil & stencil = stencils[p];
                 if( stencil.get_i() == i_basis )
                 {
-                    for( int idx_interaction = 0; idx_interaction < N; idx_interaction++ )
+                    for( int idx_interaction = 0; idx_interaction < Stencil::N_interaction - 1; idx_interaction++ )
                     {
                         int idx_j
                             = stencil.get_j( idx_interaction )
                               + state.n_cell_atoms * ( ( a + stencil.get_da( idx_interaction ) ) + Na * ( b + stencil.get_db( idx_interaction ) + Nb * ( c + stencil.get_dc( idx_interaction ) ) ) );
                         if( idx_j >= 0 && idx_j < state.nos )
                         {
-                            interaction_spins[idx_interaction] = state.spins[idx_j];
+                            interaction_spins[idx_interaction + 1] = state.spins[idx_j];
                         }
                         else
                         {
-                            interaction_spins[idx_interaction] = { 0, 0, 0 };
+                            interaction_spins[idx_interaction + 1] = { 0, 0, 0 };
                         }
                     }
-                    state.gradient[idx_i] += stencil.gradient( state.spins[idx_i], interaction_spins );
+                    state.gradient[idx_i] += stencil.gradient( interaction_spins );
                 }
             }
         }
@@ -99,9 +100,9 @@ void iterate( Spirit::Host::Host_State & state, int N_iterations )
     for( int iter = 0; iter < N_iterations; iter++ )
     {
         set_gradient_zero( state.device_state );
-        stencil_gradient<1, ED_Stencil>( state.device_state );
-        stencil_gradient<0, K_Stencil>( state.device_state );
-        stencil_gradient<0, Bfield_Stencil>( state.device_state );
+        stencil_gradient<ED_Stencil>( state.device_state );
+        stencil_gradient<K_Stencil>( state.device_state );
+        stencil_gradient<Bfield_Stencil>( state.device_state );
 
         propagate_spins( state.device_state );
         if( iter % 250 == 0 )

@@ -5,54 +5,54 @@
 namespace Spirit
 {
 
-struct ED_Stencil : Stencil<1, Matrix3>
+struct ED_Stencil : Stencil<2, Matrix3>
 {
-    ED_Stencil( int i, std::array<int, 1> j, std::array<int, 1> da, std::array<int, 1> db, std::array<int, 1> dc, Matrix3 param ) : Stencil<1, Matrix3>( i, j, da, db, dc, param ){};
+    ED_Stencil( int i, std::array<int, 1> j, std::array<int, 1> da, std::array<int, 1> db, std::array<int, 1> dc, Matrix3 param ) : Stencil<2, Matrix3>( i, j, da, db, dc, param ){};
 
     HD_ATTRIBUTE
-    Vector3 gradient( const Vector3 & spin, const Vector3NArray & interaction_spins )
+    Vector3 gradient( const Vector3NArray & interaction_spins )
     {
-        return param * interaction_spins[0];
+        return param * interaction_spins[1];
     }
 
     HD_ATTRIBUTE
-    scalar energy( const Vector3 & spin, const Vector3NArray & interaction_spins )
+    scalar energy( const Vector3NArray & interaction_spins )
     {
-        return spin.transpose() * param * interaction_spins[0];
+        return interaction_spins[0].transpose() * param * interaction_spins[1];
     }
 };
 
-struct Bfield_Stencil : Stencil<0, Vector3>
+struct Bfield_Stencil : Stencil<1, Vector3>
 {
-    Bfield_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param ) : Stencil<0, Vector3>( i, j, da, db, dc, param ){};
+    Bfield_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param ) : Stencil<1, Vector3>( i, j, da, db, dc, param ){};
 
     HD_ATTRIBUTE
-    Vector3 gradient( const Vector3 & spin, const Vector3NArray & interaction_spins )
+    Vector3 gradient( const Vector3NArray & interaction_spins )
     {
         return param;
     }
 
     HD_ATTRIBUTE
-    scalar energy( const Vector3 & spin, const Vector3NArray & interaction_spins )
+    scalar energy( const Vector3NArray & interaction_spins )
     {
-        return param.dot( spin );
+        return param.dot( interaction_spins[0] );
     }
 };
 
-struct K_Stencil : Stencil<0, Vector3>
+struct K_Stencil : Stencil<1, Vector3>
 {
-    K_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param ) : Stencil<0, Vector3>( i, j, da, db, dc, param ){};
+    K_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param ) : Stencil<1, Vector3>( i, j, da, db, dc, param ){};
 
     HD_ATTRIBUTE
-    Vector3 gradient( const Vector3 & spin, const Vector3NArray & interaction_spins )
+    Vector3 gradient( const Vector3NArray & interaction_spins )
     {
-        return 2 * param * ( param.normalized().dot( spin ) );
+        return 2 * param * ( param.normalized().dot( interaction_spins[0] ) );
     }
 
     HD_ATTRIBUTE
-    scalar energy( const Vector3 & spin, const Vector3NArray & interaction_spins )
+    scalar energy( const Vector3NArray & interaction_spins )
     {
-        return param.norm() * ( param.normalized().dot( spin ) ) * ( param.normalized().dot( spin ) );
+        return param.norm() * ( param.normalized().dot( interaction_spins[0] ) ) * ( param.normalized().dot( interaction_spins[0] ) );
     }
 };
 
