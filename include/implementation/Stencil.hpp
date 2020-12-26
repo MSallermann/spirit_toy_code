@@ -1,7 +1,7 @@
 #pragma once
 #ifndef STENCIL_HPP
 #define STENCIL_HPP
-#include "definitions.hpp"
+#include "Definitions.hpp"
 
 namespace Spirit
 {

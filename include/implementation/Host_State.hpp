@@ -1,7 +1,7 @@
 #pragma once
 #ifndef HOST_STATE_HPP
 #define HOST_STATE_HPP
-#include "definitions.hpp"
+#include "Definitions.hpp"
 #include "implementation/Device_State.hpp"
 #include "implementation/Hamiltonian.hpp"
 #include <array>

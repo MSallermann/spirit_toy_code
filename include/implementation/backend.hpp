@@ -1,7 +1,7 @@
 #pragma once
 #ifndef BACKEND_HPP
 #define BACKEND_HPP
-#include "definitions.hpp"
+#include "Definitions.hpp"
 #include "implementation/Host_State.hpp"
 namespace Spirit
 {
