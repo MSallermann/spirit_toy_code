@@ -88,6 +88,11 @@ if (${CUDA_BACKEND})
 
                 set( CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo --expt-relaxed-constexpr --expt-extended-lambda" )
                 set_target_properties( ${META_PROJECT_NAME}_CUDA PROPERTIES CUDA_SEPERABLE_COMPILATION ON )
+
+                set_source_files_properties( 
+                        ${PROJECT_SOURCE_DIR}/src/interface/State.cpp
+                        PROPERTIES LANGUAGE CUDA
+                )
         else()
                 message(STATUS "No CUDA support")
                 set(CUDA_BACKEND OFF)

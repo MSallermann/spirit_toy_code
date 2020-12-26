@@ -1,5 +1,7 @@
 #pragma once
-#ifndef CUDA_HELPER_FUNCTIONS
+#ifndef CUDA_HELPER_FUNCTIONS_HPP
+#define CUDA_HELPER_FUNCTIONS_HPP
+
 #include <vector>
 
 #define gpuErrchk( ans )                                                                                                                                                                               \

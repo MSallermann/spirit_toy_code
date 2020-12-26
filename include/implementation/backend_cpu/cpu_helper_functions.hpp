@@ -1,5 +1,6 @@
 #pragma once
-#ifndef CPU_HELPER_FUNCTIONS
+#ifndef CPU_HELPER_FUNCTIONS_HPP
+#define CPU_HELPER_FUNCTIONS_HPP
 
 namespace Spirit
 {

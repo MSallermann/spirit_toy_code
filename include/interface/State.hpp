@@ -39,6 +39,7 @@ public:
     void allocate();
     void upload();
     void download();
+    ~State();
 };
 
 } // namespace Host
