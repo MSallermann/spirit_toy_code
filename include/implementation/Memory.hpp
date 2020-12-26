@@ -6,7 +6,7 @@
 #include <vector>
 
 #ifdef BACKEND_CUDA
-#include clea "device/cuda/CUDA_Helper_Functions.hpp"
+#include "implementation/backend_cuda/cuda_helper_functions.hpp"
 #endif
 
 namespace Spirit
@@ -66,7 +66,7 @@ H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
 #pragma omp parallel for
         for( int i = 0; i < this->size(); i++ )
         {
-            host_vector[i] = this[i];
+            host_vector[i] = ( *this )[i];
         }
     }
     else
@@ -87,7 +87,7 @@ H_ATTRIBUTE void device_vector<T>::copy_from( const std::vector<T> & host_vector
 #pragma omp parallel for
         for( int i = 0; i < this->size(); i++ )
         {
-            this[i] = host_vector[i];
+            ( *this )[i] = host_vector[i];
         }
     }
     else
