@@ -21,7 +21,7 @@ class State
 {
 
 protected:
-    Device::State * device_state;
+    Device::State * device_state = nullptr;
 
 public:
     std::array<int, 3> n_cells;

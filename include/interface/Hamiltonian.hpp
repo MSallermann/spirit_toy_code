@@ -1,6 +1,6 @@
 #pragma once
-#ifndef HAMILTONIAN2_HPP
-#define HAMILTONIAN2_HPP
+#ifndef INTERFACE_HAMILTONIAN_HPP
+#define INTERFACE_HAMILTONIAN_HPP
 #include "interface/Stencil.hpp"
 #include <array>
 #include <vector>
