@@ -17,14 +17,19 @@ namespace Device
 template<typename T>
 class device_vector
 {
-    T * m_ptr;
-    size_t m_size;
+protected:
+    T * m_ptr     = nullptr;
+    size_t m_size = 0;
 
 public:
     H_ATTRIBUTE
     device_vector() : m_ptr( nullptr ), m_size( 0 ) {}
 
     H_ATTRIBUTE device_vector( size_t N );
+
+    H_ATTRIBUTE device_vector( const device_vector<T> & old_vector );
+
+    H_ATTRIBUTE device_vector & operator=( const device_vector<T> & old_vector );
 
     H_ATTRIBUTE void copy_to( std::vector<T> & host_vector );
 
@@ -52,6 +57,36 @@ H_ATTRIBUTE device_vector<T>::device_vector( size_t N )
 {
     m_ptr  = new T[N];
     m_size = N;
+}
+
+template<typename T>
+H_ATTRIBUTE device_vector<T>::device_vector( const device_vector<T> & old_vector )
+{
+    m_size = old_vector.size();
+    m_ptr  = new T[m_size];
+
+#pragma omp parallel for
+    for( int i = 0; i < m_size; i++ )
+    {
+        m_ptr[i] = old_vector.m_ptr[i];
+    }
+}
+
+template<typename T>
+H_ATTRIBUTE device_vector<T> & device_vector<T>::operator=( const device_vector<T> & old_vector )
+{
+    if( this->m_ptr != nullptr )
+        delete[] m_ptr;
+
+    m_size = old_vector.size();
+    m_ptr  = new T[m_size];
+
+#pragma omp parallel for
+    for( int i = 0; i < m_size; i++ )
+    {
+        m_ptr[i] = old_vector.m_ptr[i];
+    }
+    return *this;
 }
 
 template<typename T>
@@ -111,7 +146,10 @@ HD_ATTRIBUTE size_t device_vector<T>::size() const
 template<typename T>
 H_ATTRIBUTE device_vector<T>::~device_vector()
 {
-    delete[] m_ptr;
+    if( m_ptr != nullptr )
+    {
+        delete[] m_ptr;
+    }
 }
 
 #else
@@ -123,7 +161,26 @@ H_ATTRIBUTE device_vector<T>::device_vector( size_t N )
 }
 
 template<typename T>
-H_ATTRIBUTE void H_ATTRIBUTE device_vector<T>::copy_to( std::vector<T> & host_vector )
+H_ATTRIBUTE device_vector<T>::device_vector( const device_vector<T> & old_vector )
+{
+    m_size = old_vector.size();
+    CUDA_HELPER::malloc_n( m_ptr, m_size );
+    cudaMemcpy( m_ptr, old_vector.m_ptr, m_size * sizeof( T ), cudaMemcpyDeviceToDevice );
+}
+
+template<typename T>
+H_ATTRIBUTE device_vector<T> & device_vector<T>::operator=( const device_vector<T> & old_vector )
+{
+    if( this->m_ptr != nullptr )
+        CUDA_HELPER::free( m_ptr );
+    m_size = old_vector.size();
+    CUDA_HELPER::malloc_n( m_ptr, m_size );
+    cudaMemcpy( m_ptr, old_vector.m_ptr, m_size * sizeof( T ), cudaMemcpyDeviceToDevice );
+    return *this;
+}
+
+template<typename T>
+H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
 {
     if( this->size() == host_vector.size() )
         CUDA_HELPER::copy_vector_D2H( host_vector, this->m_ptr );
@@ -155,7 +212,8 @@ HD_ATTRIBUTE size_t device_vector<T>::size() const
 template<typename T>
 H_ATTRIBUTE device_vector<T>::~device_vector()
 {
-    CUDA_HELPER::free( m_ptr );
+    if( m_ptr != nullptr )
+        CUDA_HELPER::free( m_ptr );
 }
 #endif
 
