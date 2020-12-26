@@ -1,7 +1,11 @@
-#ifdef BACKEND_CUDA
-#include "backend.hpp"
-#include "backend_cuda/cuda_helper_functions.hpp"
+#ifdef BACKEND_CPU
+#include "implementation/backend.hpp"
+#include "implementation/backend_cpu/cpu_helper_functions.hpp"
 #include <iostream>
+
+#ifdef USE_OPENMP
+#include "omp.h"
+#endif
 
 namespace Spirit
 {
@@ -11,26 +15,26 @@ namespace Device
 std::string description()
 {
     std::string des;
-    des = "CUDA";
+#ifdef USE_OPENMP
+    des = "CPU with OpenMP and " + std::to_string( omp_get_max_threads() ) + " thread(s)";
+#else
+    des = "CPU";
+#endif
     return des;
 }
 
-__global__ void set_gradient_zero( Device_State state )
+void set_gradient_zero( Device_State state )
 {
-    int index  = blockIdx.x * blockDim.x + threadIdx.x;
-    int stride = blockDim.x * gridDim.x;
-    for( int i = index; i < state.nos; i += stride )
+#pragma omp parallel for
+    for( int i = 0; i < state.nos; i++ )
     {
         state.gradient[i] = { 0, 0, 0 };
     }
 }
 
 template<typename Stencil>
-__global__ void stencil_gradient( Device_State state )
+void stencil_gradient( Device_State state )
 {
-    int index  = blockIdx.x * blockDim.x + threadIdx.x;
-    int stride = blockDim.x * gridDim.x;
-
     int Na = state.n_cells[0];
     int Nb = state.n_cells[1];
     // int Nc = state.n_cells[2]; Not needed
@@ -38,10 +42,11 @@ __global__ void stencil_gradient( Device_State state )
     auto N_Stencil = get_n_stencil<Stencil>( state );
     auto stencils  = get_stencils<Stencil>( state );
 
-    for( int i_cell = index; i_cell < state.n_cells_total; i_cell += stride )
+#pragma omp parallel for
+    for( int i_cell = 0; i_cell < state.n_cells_total; i_cell++ )
     {
         int tupel[3];
-        CUDA_HELPER::cu_tupel_from_idx( i_cell, tupel, state.n_cells, 3 ); // tupel now is {i, a, b, c}
+        CPU_HELPER::tupel_from_idx( i_cell, tupel, state.n_cells, 3 ); // tupel now is {i, a, b, c}
         int a = tupel[0];
         int b = tupel[1];
         int c = tupel[2];
@@ -80,11 +85,10 @@ __global__ void stencil_gradient( Device_State state )
     }
 }
 
-__global__ void propagate_spins( Device_State state )
+void propagate_spins( Device_State state )
 {
-    int index  = blockIdx.x * blockDim.x + threadIdx.x;
-    int stride = blockDim.x * gridDim.x;
-    for( int idx = index; idx < state.nos; idx += stride )
+#pragma omp parallel for
+    for( int idx = 0; idx < state.nos; idx++ )
     {
         state.spins[idx] += state.timestep * state.gradient[idx];
         state.spins[idx].normalize();
@@ -93,28 +97,14 @@ __global__ void propagate_spins( Device_State state )
 
 void iterate( Spirit::Host::Host_State & state, int N_iterations )
 {
-    int blockSize = 1024;
-    int numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
-
-    Bfield_Stencil b( 0, {}, {}, {}, {}, { 0, 1, 0 } );
-    Bfield_Stencil * b_dev_ptr;
-
-    CUDA_HELPER::malloc_n( b_dev_ptr, 1 );
-    CUDA_HELPER::copy_H2D( b_dev_ptr, &b );
-
     for( int iter = 0; iter < N_iterations; iter++ )
     {
-        numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
-        set_gradient_zero<<<numBlocks, blockSize>>>( state.device_state );
+        set_gradient_zero( state.device_state );
+        stencil_gradient<ED_Stencil>( state.device_state );
+        stencil_gradient<K_Stencil>( state.device_state );
+        stencil_gradient<Bfield_Stencil>( state.device_state );
 
-        numBlocks = ( state.n_cells_total + blockSize - 1 ) / blockSize;
-
-        stencil_gradient<ED_Stencil><<<numBlocks, blockSize>>>( state.device_state );
-        stencil_gradient<Bfield_Stencil><<<numBlocks, blockSize>>>( state.device_state );
-        stencil_gradient<K_Stencil><<<numBlocks, blockSize>>>( state.device_state );
-
-        numBlocks = ( state.nos + blockSize - 1 ) / blockSize;
-        propagate_spins<<<numBlocks, blockSize>>>( state.device_state );
+        propagate_spins( state.device_state );
         if( iter % 250 == 0 )
         {
             printf( "iter = %i\n", iter );
@@ -123,7 +113,6 @@ void iterate( Spirit::Host::Host_State & state, int N_iterations )
             std::cout << "    gradient[0,0,0] = " << state.gradient[0].transpose() << "\n";
         }
     }
-    cudaDeviceSynchronize();
     state.Download();
 }
 

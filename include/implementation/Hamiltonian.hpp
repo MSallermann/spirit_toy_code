@@ -1,7 +1,7 @@
 #pragma once
 #ifndef HAMILTONIAN_HPP
 #define HAMILTONIAN_HPP
-#include "Stencil.hpp"
+#include "implementation/Stencil.hpp"
 namespace Spirit
 {
 

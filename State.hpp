@@ -2,8 +2,8 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-#include "Device_State.hpp"
-#include "Host_State.hpp"
+#include "implementation/Device_State.hpp"
+#include "implementation/Host_State.hpp"
 
 namespace Spirit
 {

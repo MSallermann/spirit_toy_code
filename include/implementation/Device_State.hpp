@@ -1,8 +1,8 @@
 #pragma once
 #ifndef DEVICE_STATE_HPP
 #define DEVICE_STATE_HPP
-#include "Hamiltonian.hpp"
 #include "definitions.hpp"
+#include "implementation/Hamiltonian.hpp"
 
 namespace Spirit
 {

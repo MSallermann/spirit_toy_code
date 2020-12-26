@@ -48,10 +48,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set( SRC 
         ${PROJECT_SOURCE_DIR}/main.cpp
-        ${PROJECT_SOURCE_DIR}/src/backend_cpu/backend_cpu.cpp
-        ${PROJECT_SOURCE_DIR}/src/backend_cpu/Device_State.cpp
-        ${PROJECT_SOURCE_DIR}/src/backend_cuda/backend_cuda.cu
-        ${PROJECT_SOURCE_DIR}/src/backend_cuda/Device_State.cu
+        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cpu/backend_cpu.cpp
+        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cpu/Device_State.cpp
+        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cuda/backend_cuda.cu
+        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cuda/Device_State.cu
         # ${PROJECT_SOURCE_DIR}/src/backend_vulkan/backend_vulkan.cpp
         # ${PROJECT_SOURCE_DIR}/src/backend_vulkan/Device_State.cpp
 )

@@ -1,5 +1,5 @@
-#include "State.hpp"
-#include "backend.hpp"
+#include "implementation/State.hpp"
+#include "implementation/backend.hpp"
 
 State::State( std::array<int, 3> n_cells, int n_cell_atoms, scalar timestep ) : n_cells( n_cells ), n_cell_atoms( n_cell_atoms ), timestep( timestep )
 {

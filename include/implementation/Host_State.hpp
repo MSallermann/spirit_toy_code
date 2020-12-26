@@ -1,9 +1,9 @@
 #pragma once
 #ifndef HOST_STATE_HPP
 #define HOST_STATE_HPP
-#include "Device_State.hpp"
-#include "Hamiltonian.hpp"
 #include "definitions.hpp"
+#include "implementation/Device_State.hpp"
+#include "implementation/Hamiltonian.hpp"
 #include <array>
 #include <memory>
 #include <vector>

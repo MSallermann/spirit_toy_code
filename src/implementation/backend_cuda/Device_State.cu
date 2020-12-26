@@ -1,8 +1,8 @@
 #ifdef BACKEND_CUDA
 
-#include "Device_State.hpp"
-#include "Host_State.hpp"
-#include "backend_cuda/cuda_helper_functions.hpp"
+#include "implementation/Device_State.hpp"
+#include "implementation/Host_State.hpp"
+#include "implementation/backend_cuda/cuda_helper_functions.hpp"
 
 namespace Spirit
 {

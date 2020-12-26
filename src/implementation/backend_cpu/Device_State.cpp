@@ -1,7 +1,7 @@
 #ifdef BACKEND_CPU
 
-#include "Device_State.hpp"
-#include "Host_State.hpp"
+#include "implementation/Device_State.hpp"
+#include "implementation/Host_State.hpp"
 
 namespace Spirit
 {
