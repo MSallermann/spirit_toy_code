@@ -20,10 +20,9 @@ namespace Host
 class State
 {
 
-protected:
+public:
     Device::State * device_state = nullptr;
 
-public:
     State( std::array<int, 3> n_cells, int n_cell_atoms ) : n_cells( n_cells ), n_cell_atoms( n_cell_atoms )
     {
         n_cells_total = n_cells[0] * n_cells[1] * n_cells[2];
