@@ -105,7 +105,7 @@ H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
 #pragma omp parallel for
         for( int i = 0; i < this->size(); i++ )
         {
-            host_vector[i] = ( *this )[i];
+            host_vector[i] = ( this->m_ptr )[i];
         }
     }
     else
@@ -120,7 +120,7 @@ H_ATTRIBUTE void device_vector<T>::copy_to( T * host_ptr )
 #pragma omp parallel for
     for( int i = 0; i < this->size(); i++ )
     {
-        host_ptr[i] = ( *this )[i];
+        host_ptr[i] = ( this->m_ptr )[i];
     }
 }
 
@@ -136,7 +136,7 @@ H_ATTRIBUTE void device_vector<T>::copy_from( const std::vector<T> & host_vector
 #pragma omp parallel for
         for( int i = 0; i < this->size(); i++ )
         {
-            ( *this )[i] = host_vector[i];
+            ( this->m_ptr )[i] = host_vector[i];
         }
     }
     else
@@ -151,7 +151,7 @@ H_ATTRIBUTE void device_vector<T>::copy_from( T * host_ptr )
 #pragma omp parallel for
     for( int i = 0; i < this->size(); i++ )
     {
-        ( *this )[i] = host_ptr[i];
+        ( this->m_ptr )[i] = host_ptr[i];
     }
 }
 
