@@ -3,6 +3,7 @@
 #define MEMORY_HPP
 
 #include "Definitions.hpp"
+#include <string>
 #include <vector>
 
 #ifdef BACKEND_CUDA
@@ -110,7 +111,9 @@ H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
     }
     else
     {
-        throw;
+        std::string msg = "Trying to copy from device vector of size " + std::to_string( this->size() ) + " to host vector of size "
+                          + std::to_string( host_vector.size() );
+        throw std::runtime_error( msg );
     }
 }
 
@@ -141,7 +144,9 @@ H_ATTRIBUTE void device_vector<T>::copy_from( const std::vector<T> & host_vector
     }
     else
     {
-        throw;
+        std::string msg = "Trying to copy to device vector of size " + std::to_string( this->size() ) + " from host vector of size "
+                          + std::to_string( host_vector.size() );
+        throw std::runtime_error( msg );
     }
 }
 
@@ -209,7 +214,11 @@ H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
     if( this->size() == host_vector.size() )
         CUDA_HELPER::copy_vector_D2H( host_vector, this->m_ptr );
     else
-        throw;
+    {
+        std::string msg = "Trying to copy from device vector of size " + std::to_string( this->size() ) + " to host vector of size "
+                          + std::to_string( host_vector.size() );
+        throw std::runtime_error( msg );
+    }
 }
 
 template<typename T>
@@ -224,7 +233,11 @@ H_ATTRIBUTE void H_ATTRIBUTE device_vector<T>::copy_from( const std::vector<T> &
     if( this->size() == host_vector.size() )
         CUDA_HELPER::copy_vector_H2D( this->m_ptr, host_vector );
     else
-        throw;
+    {
+        std::string msg = "Trying to copy to device vector of size " + std::to_string( this->size() ) + " from host vector of size "
+                          + std::to_string( host_vector.size() );
+        throw std::runtime_error( msg );
+    }
 }
 
 template<typename T>
