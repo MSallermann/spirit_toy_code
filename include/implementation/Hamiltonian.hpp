@@ -21,13 +21,13 @@ public:
               b_stencils( device_vector<Bfield_Stencil>( ham->b_stencils.size() ) )
     {
 
-        auto ptr_ed = static_cast<ED_Stencil *>( ham->ed_stencils.data() );
+        auto ptr_ed = (ED_Stencil *)( ham->ed_stencils.data() );
         ed_stencils.copy_from( ptr_ed );
 
-        auto ptr_k = static_cast<K_Stencil *>( ham->k_stencils.data() );
+        auto ptr_k = (K_Stencil *)( ham->k_stencils.data() );
         k_stencils.copy_from( ptr_k );
 
-        auto ptr_b = static_cast<Bfield_Stencil *>( ham->k_stencils.data() );
+        auto ptr_b = (Bfield_Stencil *)( ham->b_stencils.data() );
         b_stencils.copy_from( ptr_b );
     }
 
