@@ -2,6 +2,7 @@
 #ifndef INTERFACE_STENCIL_HPP
 #define INTERFACE_STENCIL_HPP
 #include "Definitions.hpp"
+#include <array>
 
 namespace Spirit
 {
