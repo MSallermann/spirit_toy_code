@@ -4,9 +4,9 @@
 
 #include <vector>
 
-#define gpuErrchk( ans )                                                                                                                                                                               \
-    {                                                                                                                                                                                                  \
-        gpuAssert( ( ans ), __FILE__, __LINE__, __FUNCTION__ );                                                                                                                                        \
+#define gpuErrchk( ans )                                                                                                                             \
+    {                                                                                                                                                \
+        gpuAssert( ( ans ), __FILE__, __LINE__, __FUNCTION__ );                                                                                      \
     }
 
 inline void gpuAssert( cudaError_t code, const char * file, int line, const char * function, bool abort = true )
@@ -56,9 +56,23 @@ void copy_D2H( T * dest_host_ptr, T * src_dev_ptr )
 }
 
 template<typename T>
+void copy_n_D2H( T * dest_host_ptr, T * src_dev_ptr, size_t n )
+{
+    auto err = cudaMemcpy( dest_host_ptr, src_dev_ptr, n * sizeof( T ), cudaMemcpyDeviceToHost );
+    gpuErrchk( err );
+}
+
+template<typename T>
 void copy_H2D( T * dest_dev_ptr, T * src_host_ptr )
 {
     auto err = cudaMemcpy( dest_dev_ptr, src_host_ptr, sizeof( T ), cudaMemcpyHostToDevice );
+    gpuErrchk( err );
+}
+
+template<typename T>
+void copy_n_H2D( T * dest_dev_ptr, T * src_host_ptr, size_t n )
+{
+    auto err = cudaMemcpy( dest_dev_ptr, src_host_ptr, n * sizeof( T ), cudaMemcpyHostToDevice );
     gpuErrchk( err );
 }
 

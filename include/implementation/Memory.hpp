@@ -35,6 +35,10 @@ public:
 
     H_ATTRIBUTE void copy_from( const std::vector<T> & host_vector );
 
+    H_ATTRIBUTE void copy_to( T * host_ptr );
+
+    H_ATTRIBUTE void copy_from( T * host_vector );
+
     D_ATTRIBUTE
     T & operator[]( int N );
 
@@ -111,6 +115,16 @@ H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
 }
 
 template<typename T>
+H_ATTRIBUTE void device_vector<T>::copy_to( T * host_ptr )
+{
+#pragma omp parallel for
+    for( int i = 0; i < this->size(); i++ )
+    {
+        host_ptr[i] = ( *this )[i];
+    }
+}
+
+template<typename T>
 H_ATTRIBUTE void device_vector<T>::copy_from( const std::vector<T> & host_vector )
 {
     if( host_vector.data() == this->m_ptr )
@@ -128,6 +142,16 @@ H_ATTRIBUTE void device_vector<T>::copy_from( const std::vector<T> & host_vector
     else
     {
         throw;
+    }
+}
+
+template<typename T>
+H_ATTRIBUTE void device_vector<T>::copy_from( T * host_ptr )
+{
+#pragma omp parallel for
+    for( int i = 0; i < this->size(); i++ )
+    {
+        ( *this )[i] = host_ptr[i];
     }
 }
 
@@ -189,12 +213,24 @@ H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
 }
 
 template<typename T>
+H_ATTRIBUTE void device_vector<T>::copy_to( T * host_ptr )
+{
+    CUDA_HELPER::copy_n_D2H( host_ptr, this->m_ptr, this->size() );
+}
+
+template<typename T>
 H_ATTRIBUTE void H_ATTRIBUTE device_vector<T>::copy_from( const std::vector<T> & host_vector )
 {
     if( this->size() == host_vector.size() )
         CUDA_HELPER::copy_vector_H2D( this->m_ptr, host_vector );
     else
         throw;
+}
+
+template<typename T>
+H_ATTRIBUTE void device_vector<T>::copy_from( T * host_ptr )
+{
+    CUDA_HELPER::copy_n_H2D( this->m_ptr, host_ptr, this->size() );
 }
 
 template<typename T>
