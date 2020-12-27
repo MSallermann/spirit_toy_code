@@ -2,6 +2,7 @@
 #ifndef IMPLEMENTATION_STATE_HPP
 #define IMPLEMENTATION_STATE_HPP
 #include "Definitions.hpp"
+#include "implementation/Hamiltonian.hpp"
 #include "implementation/Memory.hpp"
 #include "interface/State.hpp"
 
@@ -19,9 +20,12 @@ public:
               n_cell_atoms( state->n_cell_atoms ),
               n_cells_total( state->n_cells_total ),
               spins( device_vector<Vector3>( state->nos ) ),
-              gradient( device_vector<Vector3>( state->nos ) )
+              gradient( device_vector<Vector3>( state->nos ) ),
+              hamiltonian( Hamiltonian( &state->hamiltonian ) )
     {
     }
+
+    Hamiltonian hamiltonian;
 
     std::array<int, 3> n_cells;
     int nos;

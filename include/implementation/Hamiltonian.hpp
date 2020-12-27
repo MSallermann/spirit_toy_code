@@ -1,60 +1,43 @@
 #pragma once
-#ifndef HAMILTONIAN_HPP
-#define HAMILTONIAN_HPP
-#include "implementation/Stencil.hpp"
+#ifndef IMPLEMENTATION_HAMILTONIAN_HPP
+#define IMPLEMENTATION_HAMILTONIAN_HPP
+#include "implementation/Memory.hpp"
+#include "implementation/Stencil_Terms.hpp"
+#include "interface/Hamiltonian.hpp"
+
+#include <array>
 namespace Spirit
 {
-
-struct ED_Stencil : Stencil<2, Matrix3>
+namespace Device
 {
-    ED_Stencil( int i, std::array<int, 1> j, std::array<int, 1> da, std::array<int, 1> db, std::array<int, 1> dc, Matrix3 param ) : Stencil<2, Matrix3>( i, j, da, db, dc, param ){};
 
-    HD_ATTRIBUTE
-    Vector3 gradient( const Vector3NArray & interaction_spins )
+class Hamiltonian
+{
+public:
+    Hamiltonian( Spirit::Host::Hamiltonian * ham )
+            : boundary_conditions( ham->boundary_conditions ),
+              ed_stencils( device_vector<ED_Stencil>( ham->ed_stencils.size() ) ),
+              k_stencils( device_vector<K_Stencil>( ham->k_stencils.size() ) ),
+              b_stencils( device_vector<Bfield_Stencil>( ham->b_stencils.size() ) )
     {
-        return param * interaction_spins[1];
+
+        auto ptr_ed = static_cast<ED_Stencil *>( ham->ed_stencils.data() );
+        ed_stencils.copy_from( ptr_ed );
+
+        auto ptr_k = static_cast<K_Stencil *>( ham->k_stencils.data() );
+        k_stencils.copy_from( ptr_k );
+
+        auto ptr_b = static_cast<Bfield_Stencil *>( ham->k_stencils.data() );
+        b_stencils.copy_from( ptr_b );
     }
 
-    HD_ATTRIBUTE
-    scalar energy( const Vector3NArray & interaction_spins )
-    {
-        return interaction_spins[0].transpose() * param * interaction_spins[1];
-    }
+    std::array<bool, 3> boundary_conditions;
+    device_vector<ED_Stencil> ed_stencils;
+    device_vector<K_Stencil> k_stencils;
+    device_vector<Bfield_Stencil> b_stencils;
 };
 
-struct Bfield_Stencil : Stencil<1, Vector3>
-{
-    Bfield_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param ) : Stencil<1, Vector3>( i, j, da, db, dc, param ){};
-
-    HD_ATTRIBUTE
-    Vector3 gradient( const Vector3NArray & interaction_spins )
-    {
-        return param;
-    }
-
-    HD_ATTRIBUTE
-    scalar energy( const Vector3NArray & interaction_spins )
-    {
-        return param.dot( interaction_spins[0] );
-    }
-};
-
-struct K_Stencil : Stencil<1, Vector3>
-{
-    K_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param ) : Stencil<1, Vector3>( i, j, da, db, dc, param ){};
-
-    HD_ATTRIBUTE
-    Vector3 gradient( const Vector3NArray & interaction_spins )
-    {
-        return 2 * param * ( param.normalized().dot( interaction_spins[0] ) );
-    }
-
-    HD_ATTRIBUTE
-    scalar energy( const Vector3NArray & interaction_spins )
-    {
-        return param.norm() * ( param.normalized().dot( interaction_spins[0] ) ) * ( param.normalized().dot( interaction_spins[0] ) );
-    }
-};
-
+} // namespace Device
 } // namespace Spirit
+
 #endif
