@@ -8,12 +8,58 @@ namespace Spirit
 {
 namespace Device
 {
-struct ED_Stencil : Stencil<2, Matrix3>
+
+template<int N, typename PARAM>
+struct StencilImp : Stencil<N, PARAM>
+{
+    using Vector3NArray = Vector3[N];
+    StencilImp()        = default;
+    StencilImp( int i, std::array<int, N - 1> j, std::array<int, N - 1> da, std::array<int, N - 1> db, std::array<int, N - 1> dc, PARAM param )
+            : Stencil<N, PARAM>( i, j, da, db, dc, param ){};
+
+    D_ATTRIBUTE
+    inline int get_i()
+    {
+        return this->i;
+    }
+
+    D_ATTRIBUTE
+    inline int get_j( int idx )
+    {
+        return ( (int *)&this->j )[idx];
+    }
+
+    D_ATTRIBUTE
+    inline int get_da( int idx )
+    {
+        return ( (int *)&this->da )[idx];
+    }
+
+    D_ATTRIBUTE
+    inline int get_db( int idx )
+    {
+        return ( (int *)&this->db )[idx];
+    }
+
+    D_ATTRIBUTE
+    inline int get_dc( int idx )
+    {
+        return ( (int *)&this->dc )[idx];
+    }
+
+    HD_ATTRIBUTE
+    virtual Vector3 gradient( const Vector3NArray & interaction_spins ) = 0;
+
+    HD_ATTRIBUTE
+    virtual scalar energy( const Vector3NArray & interaction_spins ) = 0;
+};
+
+struct ED_Stencil : StencilImp<2, Matrix3>
 {
     ED_Stencil() = default;
 
     ED_Stencil( int i, std::array<int, 1> j, std::array<int, 1> da, std::array<int, 1> db, std::array<int, 1> dc, Matrix3 param )
-            : Stencil<2, Matrix3>( i, j, da, db, dc, param ){};
+            : StencilImp<2, Matrix3>( i, j, da, db, dc, param ){};
 
     HD_ATTRIBUTE
     Vector3 gradient( const Vector3NArray & interaction_spins )
@@ -28,12 +74,12 @@ struct ED_Stencil : Stencil<2, Matrix3>
     }
 };
 
-struct Bfield_Stencil : Stencil<1, Vector3>
+struct Bfield_Stencil : StencilImp<1, Vector3>
 {
     Bfield_Stencil() = default;
 
     Bfield_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param )
-            : Stencil<1, Vector3>( i, j, da, db, dc, param ){};
+            : StencilImp<1, Vector3>( i, j, da, db, dc, param ){};
 
     HD_ATTRIBUTE
     Vector3 gradient( const Vector3NArray & interaction_spins )
@@ -48,11 +94,11 @@ struct Bfield_Stencil : Stencil<1, Vector3>
     }
 };
 
-struct K_Stencil : Stencil<1, Vector3>
+struct K_Stencil : StencilImp<1, Vector3>
 {
     K_Stencil() = default;
     K_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param )
-            : Stencil<1, Vector3>( i, j, da, db, dc, param ){};
+            : StencilImp<1, Vector3>( i, j, da, db, dc, param ){};
 
     HD_ATTRIBUTE
     Vector3 gradient( const Vector3NArray & interaction_spins )

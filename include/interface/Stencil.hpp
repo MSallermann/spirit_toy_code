@@ -12,7 +12,6 @@ namespace Device
 template<int N, typename PARAM>
 struct Stencil
 {
-    using Vector3NArray                = Vector3[N];
     static constexpr int N_interaction = N;
     int i;
     std::array<int, N - 1> j;
