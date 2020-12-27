@@ -15,19 +15,21 @@ class State
 {
 public:
     State( Spirit::Host::State * state )
-            : n_cells( state->n_cells ),
-              nos( state->nos ),
+            : nos( state->nos ),
               n_cell_atoms( state->n_cell_atoms ),
               n_cells_total( state->n_cells_total ),
               spins( device_vector<Vector3>( state->nos ) ),
               gradient( device_vector<Vector3>( state->nos ) ),
               hamiltonian( Hamiltonian( &state->hamiltonian ) )
     {
+        n_cells[0] = state->n_cells[0];
+        n_cells[1] = state->n_cells[1];
+        n_cells[2] = state->n_cells[2];
     }
 
     Hamiltonian hamiltonian;
 
-    std::array<int, 3> n_cells;
+    int n_cells[3];
     int nos;
     int n_cell_atoms;
     int n_cells_total;
@@ -35,6 +37,8 @@ public:
 
     device_vector<Vector3> spins;
     device_vector<Vector3> gradient;
+
+    void Gradient_Async( device_vector<Vector3> & gradient, State & state );
 };
 
 } // namespace Device

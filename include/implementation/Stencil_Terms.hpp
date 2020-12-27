@@ -10,7 +10,7 @@ namespace Device
 {
 
 template<int N, typename PARAM>
-struct StencilImp : Stencil<N, PARAM>
+struct StencilImp : public Stencil<N, PARAM>
 {
     using Vector3NArray = Vector3[N];
     StencilImp()        = default;
@@ -54,7 +54,7 @@ struct StencilImp : Stencil<N, PARAM>
     virtual scalar energy( const Vector3NArray & interaction_spins ) = 0;
 };
 
-struct ED_Stencil : StencilImp<2, Matrix3>
+struct ED_Stencil : public StencilImp<2, Matrix3>
 {
     ED_Stencil() = default;
 
@@ -74,7 +74,7 @@ struct ED_Stencil : StencilImp<2, Matrix3>
     }
 };
 
-struct Bfield_Stencil : StencilImp<1, Vector3>
+struct Bfield_Stencil : public StencilImp<1, Vector3>
 {
     Bfield_Stencil() = default;
 
@@ -94,7 +94,7 @@ struct Bfield_Stencil : StencilImp<1, Vector3>
     }
 };
 
-struct K_Stencil : StencilImp<1, Vector3>
+struct K_Stencil : public StencilImp<1, Vector3>
 {
     K_Stencil() = default;
     K_Stencil( int i, std::array<int, 0> j, std::array<int, 0> da, std::array<int, 0> db, std::array<int, 0> dc, Vector3 param )
