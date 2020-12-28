@@ -27,7 +27,7 @@ class Solver_Implementation
 {
 public:
     SolverType m_type;
-    virtual void progagate_spins( Implementation::State * state ) = 0;
+    virtual void progagate_spins( Interface::State * state ) = 0;
 };
 
 class Method_Implementation
@@ -39,11 +39,11 @@ protected:
     std::unordered_set<SolverType> eligible_solvers;
 
     Interface::State * m_state_host;
-    Implementation::State * m_state;
+    Implementation::Fields * m_state;
 
 public:
     virtual ~Method_Implementation() {}
-    Method_Implementation( Interface::State * state ) : m_state_host( state ), m_state( state->device_state ){};
+    Method_Implementation( Interface::State * state ) : m_state_host( state ), m_state( state->fields ){};
     virtual void iterate( int N_iterations ) = 0;
     virtual void set_solver( Solver_Implementation * solver )
     {

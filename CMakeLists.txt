@@ -49,7 +49,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set( SRC
         ${PROJECT_SOURCE_DIR}/main.cpp
         ${PROJECT_SOURCE_DIR}/src/interface/State.cpp
-        ${PROJECT_SOURCE_DIR}/src/implementation/State.cpp
         ${PROJECT_SOURCE_DIR}/src/interface/Method.cpp
         ${PROJECT_SOURCE_DIR}/src/implementation/Kernels.cpu.cpp
         ${PROJECT_SOURCE_DIR}/src/implementation/Kernels.cuda.cu
@@ -89,7 +88,6 @@ if (${CUDA_BACKEND})
 
                 set_source_files_properties( 
                         ${PROJECT_SOURCE_DIR}/src/interface/State.cpp
-                        ${PROJECT_SOURCE_DIR}/src/implementation/State.cpp
                         ${PROJECT_SOURCE_DIR}/src/interface/Method.cpp
                         PROPERTIES LANGUAGE CUDA
                 )

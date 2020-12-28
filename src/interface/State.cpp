@@ -1,5 +1,6 @@
 #include "interface/State.hpp"
-#include "implementation/State.hpp"
+#include "implementation/Fields.hpp"
+#include "implementation/Hamiltonian.hpp"
 #include <iostream>
 
 namespace Spirit
@@ -9,29 +10,41 @@ namespace Interface
 
 void State::allocate()
 {
-    if( this->device_state != nullptr )
+    if( this->fields != nullptr )
     {
-        delete this->device_state;
+        delete this->fields;
     }
-    this->device_state = new Spirit::Implementation::State( this );
+    this->fields           = new Implementation::Fields();
+    this->fields->spins    = Implementation::device_vector<Vector3>( this->geometry.nos );
+    this->fields->gradient = Implementation::device_vector<Vector3>( this->geometry.nos );
 }
 
 void State::upload()
 {
-    this->device_state->spins.copy_from( this->spins );
+    this->fields->spins.copy_from( this->spins );
+
+    if( this->hamiltonian_device != nullptr )
+    {
+        delete this->hamiltonian_device;
+    }
+    this->hamiltonian_device = new Implementation::Hamiltonian( &( this->hamiltonian ) );
 }
 
 void State::download()
 {
-    this->device_state->spins.copy_to( this->spins );
-    this->device_state->gradient.copy_to( this->gradient );
+    this->fields->spins.copy_to( this->spins );
+    this->fields->gradient.copy_to( this->gradient );
 }
 
 State::~State()
 {
-    if( this->device_state != nullptr )
+    if( this->fields != nullptr )
     {
-        delete this->device_state;
+        delete this->fields;
+    }
+    if( this->hamiltonian_device != nullptr )
+    {
+        delete this->hamiltonian_device;
     }
 }
 

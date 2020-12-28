@@ -1,9 +1,10 @@
 #pragma once
 #ifndef IMPLEMENTATION_SOLVER_GRADIENT_DESCENT_HPP
 #define IMPLEMENTATION_SOLVER_GRADIENT_DESCENT_HPP
+#include "implementation/Fields.hpp"
 #include "implementation/Kernels.hpp"
-#include "implementation/State.hpp"
 #include "interface/Method.hpp"
+#include "interface/State.hpp"
 
 namespace Spirit
 {
@@ -12,9 +13,9 @@ namespace Implementation
 
 class Solver_Gradient_Descent : public Interface::Solver_Implementation
 {
-    virtual void progagate_spins( Implementation::State * state ) override
+    virtual void progagate_spins( Interface::State * state ) override
     {
-        Kernels::propagate_spins( state->spins.data(), state->gradient.data(), state->pod );
+        Kernels::propagate_spins( state->fields->spins.data(), state->fields->gradient.data(), state->solver_parameters, state->geometry );
     };
 };
 

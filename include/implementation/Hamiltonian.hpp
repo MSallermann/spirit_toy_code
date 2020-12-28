@@ -2,6 +2,7 @@
 #ifndef IMPLEMENTATION_HAMILTONIAN_HPP
 #define IMPLEMENTATION_HAMILTONIAN_HPP
 #include "implementation/Memory.hpp"
+#include "implementation/Stencil_Evaluator.hpp"
 #include "implementation/Stencil_Terms.hpp"
 #include "interface/Hamiltonian.hpp"
 
@@ -29,6 +30,22 @@ public:
 
         auto ptr_b = (Bfield_Stencil *)( ham->b_stencils.data() );
         b_stencils.copy_from( ptr_b );
+    }
+
+    void get_gradient( Vector3 * gradient, Vector3 * spins, Interface::State::Geometry & geometry )
+    {
+        if( ed_stencils.size() > 0 )
+        {
+            stencil_gradient( gradient, spins, geometry, ed_stencils.size(), ed_stencils.data() );
+        }
+        if( k_stencils.size() > 0 )
+        {
+            stencil_gradient( gradient, spins, geometry, k_stencils.size(), k_stencils.data() );
+        }
+        if( b_stencils.size() > 0 )
+        {
+            stencil_gradient( gradient, spins, geometry, b_stencils.size(), b_stencils.data() );
+        }
     }
 
     std::array<bool, 3> boundary_conditions;

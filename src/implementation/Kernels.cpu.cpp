@@ -7,21 +7,22 @@ namespace Implementation
 namespace Kernels
 {
 
-void set_gradient_zero( Vector3 * gradient, State_Pod & state )
+void set_gradient_zero( Vector3 * gradient, Interface::State::Geometry & geometry )
 {
 #pragma omp parallel for
-    for( int i = 0; i < state.nos; i++ )
+    for( int i = 0; i < geometry.nos; i++ )
     {
         gradient[i] = { 0, 0, 0 };
     }
 }
 
-void propagate_spins( Vector3 * spins, Vector3 * gradient, State_Pod & state )
+void propagate_spins(
+    Vector3 * spins, Vector3 * gradient, Interface::State::Solver_Parameters & solver_parameters, Interface::State::Geometry & geometry )
 {
 #pragma omp parallel for
-    for( int idx = 0; idx < state.nos; idx++ )
+    for( int idx = 0; idx < geometry.nos; idx++ )
     {
-        spins[idx] += state.timestep * gradient[idx];
+        spins[idx] += solver_parameters.timestep * gradient[idx];
         spins[idx].normalize();
     }
 }

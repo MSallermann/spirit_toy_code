@@ -1,8 +1,9 @@
 #pragma once
 #ifndef IMPLEMENTATION_METHOD_MINIMIZE_HPP
 #define IMPLEMENTATION_METHOD_MINIMIZE_HPP
+#include "implementation/Fields.hpp"
+#include "implementation/Hamiltonian.hpp"
 #include "implementation/Kernels.hpp"
-#include "implementation/State.hpp"
 #include "interface/Method.hpp"
 #include <iostream>
 namespace Spirit
@@ -23,10 +24,9 @@ public:
 
         for( int iter = 0; iter < N_iterations; iter++ )
         {
-
-            Kernels::set_gradient_zero( m_state->gradient.data(), m_state->pod );
-            m_state->get_gradient( m_state->gradient.data(), m_state->spins.data(), m_state->pod );
-            m_solver->progagate_spins( m_state );
+            Kernels::set_gradient_zero( m_state->gradient.data(), m_state_host->geometry );
+            m_state_host->hamiltonian_device->get_gradient( m_state->gradient.data(), m_state->spins.data(), m_state_host->geometry );
+            m_solver->progagate_spins( m_state_host );
 
             if( iter % 250 == 0 )
             {
