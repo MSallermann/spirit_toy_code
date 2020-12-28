@@ -12,7 +12,7 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 
 template<typename T>
@@ -266,7 +266,7 @@ H_ATTRIBUTE device_vector<T>::~device_vector()
 }
 #endif
 
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 
 #endif

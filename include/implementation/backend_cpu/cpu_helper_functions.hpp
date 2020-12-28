@@ -4,7 +4,7 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 namespace CPU_HELPER
 {
@@ -25,6 +25,6 @@ inline void tupel_from_idx( int & idx, int * tupel, int * maxVal, int n )
 }
 
 } // namespace CPU_HELPER
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 #endif

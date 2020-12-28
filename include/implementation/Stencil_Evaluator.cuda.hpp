@@ -8,7 +8,7 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 
 template<typename Stencil>
@@ -72,7 +72,7 @@ void stencil_gradient( Vector3 * gradient, Vector3 * spins, State_Pod & state, i
     __stencil_gradient<<<numBlocks, blockSize>>>( gradient, spins, state, N_Stencil, stencils );
 }
 
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 
 #endif

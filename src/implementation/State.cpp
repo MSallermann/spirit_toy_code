@@ -3,7 +3,7 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 
 void State::Gradient_Async( Vector3 * gradient, Vector3 * spins, State_Pod & state_pod )
@@ -22,5 +22,5 @@ void State::Gradient_Async( Vector3 * gradient, Vector3 * spins, State_Pod & sta
     }
 }
 
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit

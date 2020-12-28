@@ -8,7 +8,7 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 
 struct State_Pod
@@ -23,7 +23,7 @@ struct State_Pod
 class State
 {
 public:
-    State( Spirit::Host::State * state )
+    State( Spirit::Interface::State * state )
             : spins( device_vector<Vector3>( state->nos ) ),
               gradient( device_vector<Vector3>( state->nos ) ),
               hamiltonian( Hamiltonian( &state->hamiltonian ) )
@@ -47,7 +47,7 @@ public:
     void Gradient_Async( Vector3 * gradient, Vector3 * spins, State_Pod & state_pod );
 };
 
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 
 #endif

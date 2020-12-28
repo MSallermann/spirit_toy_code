@@ -10,18 +10,18 @@
 namespace Spirit
 {
 
-namespace Device
+namespace Implementation
 {
 class State;
 }
 
-namespace Host
+namespace Interface
 {
 class State
 {
 
 public:
-    Device::State * device_state = nullptr;
+    Implementation::State * device_state = nullptr;
 
     State( std::array<int, 3> n_cells, int n_cell_atoms )
             : n_cells( n_cells ),
@@ -60,7 +60,7 @@ public:
     ~State();
 };
 
-} // namespace Host
+} // namespace Interface
 } // namespace Spirit
 
 #endif

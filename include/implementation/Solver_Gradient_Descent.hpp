@@ -7,18 +7,18 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 
 class Solver_Gradient_Descent : public Solver_Implementation
 {
-    virtual void progagate_spins( Device::State * state ) override
+    virtual void progagate_spins( Implementation::State * state ) override
     {
         Kernels::propagate_spins( state->spins.data(), state->gradient.data(), state->pod );
     };
 };
 
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 
 #endif

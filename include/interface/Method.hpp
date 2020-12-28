@@ -25,7 +25,7 @@ class Solver_Implementation
 {
 public:
     SolverType m_type;
-    virtual void progagate_spins( Device::State * state ) = 0;
+    virtual void progagate_spins( Implementation::State * state ) = 0;
 };
 
 class Method_Implementation
@@ -36,12 +36,12 @@ protected:
     Solver_Implementation * m_solver;
     std::unordered_set<SolverType> eligible_solvers;
 
-    Host::State * m_state_host;
-    Device::State * m_state;
+    Interface::State * m_state_host;
+    Implementation::State * m_state;
 
 public:
     virtual ~Method_Implementation() {}
-    Method_Implementation( Host::State * state ) : m_state_host( state ), m_state( state->device_state ){};
+    Method_Implementation( Interface::State * state ) : m_state_host( state ), m_state( state->device_state ){};
     virtual void iterate( int N_iterations ) = 0;
     virtual void set_solver( Solver_Implementation * solver )
     {
@@ -75,8 +75,8 @@ public:
     }
 };
 
-Solver_Implementation * get_solver_implementation( Host::State * state, SolverType type );
-Method_Implementation * get_method_implementation( Host::State * state, MethodType type );
+Solver_Implementation * get_solver_implementation( Interface::State * state, SolverType type );
+Method_Implementation * get_method_implementation( Interface::State * state, MethodType type );
 
 } // namespace Spirit
 #endif

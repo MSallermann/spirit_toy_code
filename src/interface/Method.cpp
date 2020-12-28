@@ -5,11 +5,11 @@
 namespace Spirit
 {
 
-Solver_Implementation * get_solver_implementation( Host::State * state, SolverType type )
+Solver_Implementation * get_solver_implementation( Interface::State * state, SolverType type )
 {
     if( type == SolverType::Gradient_Descent )
     {
-        return new Device::Solver_Gradient_Descent();
+        return new Implementation::Solver_Gradient_Descent();
     }
     else
     {
@@ -17,11 +17,11 @@ Solver_Implementation * get_solver_implementation( Host::State * state, SolverTy
     }
 }
 
-Method_Implementation * get_method_implementation( Host::State * state, MethodType type )
+Method_Implementation * get_method_implementation( Interface::State * state, MethodType type )
 {
     if( type == Minimisation )
     {
-        return new Device::Method_Minimize( state );
+        return new Implementation::Method_Minimize( state );
     }
     else
     {

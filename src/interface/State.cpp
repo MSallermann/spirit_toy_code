@@ -4,7 +4,7 @@
 
 namespace Spirit
 {
-namespace Host
+namespace Interface
 {
 
 void State::allocate()
@@ -13,7 +13,7 @@ void State::allocate()
     {
         delete this->device_state;
     }
-    this->device_state = new Spirit::Device::State( this );
+    this->device_state = new Spirit::Implementation::State( this );
 }
 
 void State::upload()
@@ -35,5 +35,5 @@ State::~State()
     }
 }
 
-} // namespace Host
+} // namespace Interface
 } // namespace Spirit

@@ -4,7 +4,7 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 namespace Kernels
 {
@@ -45,6 +45,6 @@ void propagate_spins( Vector3 * spins, Vector3 * gradient, State_Pod & state )
 }
 
 } // namespace Kernels
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 #endif

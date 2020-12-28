@@ -6,7 +6,7 @@
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 
 template<int N, typename PARAM>
@@ -27,6 +27,6 @@ public:
             : i( i ), j( j ), da( da ), db( db ), dc( dc ), param( param ){};
 };
 
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 #endif

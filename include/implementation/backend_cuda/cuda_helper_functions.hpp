@@ -21,7 +21,7 @@ inline void gpuAssert( cudaError_t code, const char * file, int line, const char
 
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 namespace CUDA_HELPER
 {
@@ -99,6 +99,6 @@ inline __device__ void cu_tupel_from_idx( int & idx, int * tupel, int * maxVal, 
 }
 
 } // namespace CUDA_HELPER
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 #endif

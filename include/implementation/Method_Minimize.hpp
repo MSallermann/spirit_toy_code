@@ -7,13 +7,13 @@
 #include <iostream>
 namespace Spirit
 {
-namespace Device
+namespace Implementation
 {
 
 class Method_Minimize : public Method_Implementation
 {
 public:
-    Method_Minimize( Host::State * state ) : Method_Implementation( state )
+    Method_Minimize( Interface::State * state ) : Method_Implementation( state )
     {
         this->eligible_solvers.insert( SolverType::Gradient_Descent );
     }
@@ -39,7 +39,7 @@ public:
     }
 };
 
-} // namespace Device
+} // namespace Implementation
 } // namespace Spirit
 
 #endif
