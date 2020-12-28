@@ -11,8 +11,8 @@ namespace Device
 namespace Kernels
 {
 
-void set_gradient_zero( Device::State * state );
-void propagate_spins( Device::State * state );
+void set_gradient_zero( Vector3 * gradient, State_Pod & state );
+void propagate_spins( Vector3 * spins, Vector3 * gradient, State_Pod & state );
 
 } // namespace Kernels
 } // namespace Device
