@@ -9,7 +9,7 @@ using scalar = double;
 using scalar = float;
 #endif
 
-#ifdef __CUDACC__
+#ifdef BACKEND_CUDA
 #define HD_ATTRIBUTE __host__ __device__
 #define D_ATTRIBUTE __device__
 #define H_ATTRIBUTE __host__
