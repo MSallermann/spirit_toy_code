@@ -12,6 +12,7 @@ namespace Device
 template<int N, typename PARAM>
 struct Stencil
 {
+public:
     static constexpr int N_interaction = N;
     int i;
     std::array<int, N - 1> j;

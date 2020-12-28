@@ -1,6 +1,7 @@
 #pragma once
 #ifndef IMPLEMENTATION_SOLVER_GRADIENT_DESCENT_HPP
 #define IMPLEMENTATION_SOLVER_GRADIENT_DESCENT_HPP
+#include "implementation/Kernels.hpp"
 #include "implementation/State.hpp"
 #include "interface/Method.hpp"
 
@@ -13,7 +14,7 @@ class Solver_Gradient_Descent : public Solver_Implementation
 {
     virtual void progagate_spins( Device::State * state ) override
     {
-        printf( "progagate spins gd\n" );
+        Kernels::propagate_spins( state );
     };
 };
 

@@ -11,7 +11,7 @@ namespace Device
 {
 
 template<typename Stencil>
-void stencil_gradient( State state, int N_Stencil, Stencil * stencils )
+void stencil_gradient( device_vector<Vector3> & gradient, State & state, int N_Stencil, Stencil * stencils )
 {
     int Na = state.n_cells[0];
     int Nb = state.n_cells[1];
@@ -54,7 +54,7 @@ void stencil_gradient( State state, int N_Stencil, Stencil * stencils )
                             interaction_spins[idx_interaction + 1] = { 0, 0, 0 };
                         }
                     }
-                    state.gradient[idx_i] += stencil.gradient( interaction_spins );
+                    gradient[idx_i] += stencil.gradient( interaction_spins );
                 }
             }
         }

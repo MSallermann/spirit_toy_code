@@ -18,6 +18,7 @@ public:
             : nos( state->nos ),
               n_cell_atoms( state->n_cell_atoms ),
               n_cells_total( state->n_cells_total ),
+              timestep( state->timestep ),
               spins( device_vector<Vector3>( state->nos ) ),
               gradient( device_vector<Vector3>( state->nos ) ),
               hamiltonian( Hamiltonian( &state->hamiltonian ) )
@@ -26,8 +27,6 @@ public:
         n_cells[1] = state->n_cells[1];
         n_cells[2] = state->n_cells[2];
     }
-
-    Hamiltonian hamiltonian;
 
     int n_cells[3];
     int nos;
@@ -38,7 +37,9 @@ public:
     device_vector<Vector3> spins;
     device_vector<Vector3> gradient;
 
-    void Gradient_Async( device_vector<Vector3> & gradient, State & state );
+    Hamiltonian hamiltonian;
+
+    void Gradient_Async( device_vector<Vector3> & gradient );
 };
 
 } // namespace Device

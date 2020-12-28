@@ -1,7 +1,7 @@
 #pragma once
 #ifndef IMPLEMENTATION_STENCIL_TERMS
 #define IMPLEMENTATION_STENCIL_TERMS
-#include "implementation/Stencil.hpp"
+#include "interface/Stencil.hpp"
 #include <array>
 
 namespace Spirit
@@ -16,6 +16,16 @@ struct StencilImp : public Stencil<N, PARAM>
     StencilImp()        = default;
     StencilImp( int i, std::array<int, N - 1> j, std::array<int, N - 1> da, std::array<int, N - 1> db, std::array<int, N - 1> dc, PARAM param )
             : Stencil<N, PARAM>( i, j, da, db, dc, param ){};
+
+    H_ATTRIBUTE void read_from_host( const Spirit::Device::Stencil<N, PARAM> & interface_stencil )
+    {
+        this->i     = interface_stencil.i;
+        this->j     = interface_stencil.j;
+        this->da    = interface_stencil.da;
+        this->db    = interface_stencil.db;
+        this->dc    = interface_stencil.dc;
+        this->param = interface_stencil.param;
+    }
 
     D_ATTRIBUTE
     inline int get_i()
@@ -46,12 +56,6 @@ struct StencilImp : public Stencil<N, PARAM>
     {
         return ( (int *)&this->dc )[idx];
     }
-
-    HD_ATTRIBUTE
-    virtual Vector3 gradient( const Vector3NArray & interaction_spins ) = 0;
-
-    HD_ATTRIBUTE
-    virtual scalar energy( const Vector3NArray & interaction_spins ) = 0;
 };
 
 struct ED_Stencil : public StencilImp<2, Matrix3>

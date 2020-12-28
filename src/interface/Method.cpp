@@ -21,7 +21,6 @@ Method_Implementation * get_method_implementation( Host::State * state, MethodTy
 {
     if( type == Minimisation )
     {
-        std::cout << "create minimize\n";
         return new Device::Method_Minimize( state );
     }
     else

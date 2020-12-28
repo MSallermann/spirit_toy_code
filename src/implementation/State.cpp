@@ -6,19 +6,19 @@ namespace Spirit
 namespace Device
 {
 
-void State::Gradient_Async( device_vector<Vector3> & gradient, State & state )
+void State::Gradient_Async( device_vector<Vector3> & gradient )
 {
     if( hamiltonian.ed_stencils.size() > 0 )
     {
-        stencil_gradient( state, hamiltonian.ed_stencils.size(), hamiltonian.ed_stencils.data() );
+        stencil_gradient( this->gradient, *this, hamiltonian.ed_stencils.size(), hamiltonian.ed_stencils.data() );
     }
     if( hamiltonian.k_stencils.size() > 0 )
     {
-        stencil_gradient( state, hamiltonian.k_stencils.size(), hamiltonian.k_stencils.data() );
+        stencil_gradient( this->gradient, *this, hamiltonian.k_stencils.size(), hamiltonian.k_stencils.data() );
     }
     if( hamiltonian.b_stencils.size() > 0 )
     {
-        stencil_gradient( state, hamiltonian.b_stencils.size(), hamiltonian.b_stencils.data() );
+        stencil_gradient( this->gradient, *this, hamiltonian.b_stencils.size(), hamiltonian.b_stencils.data() );
     }
 }
 
