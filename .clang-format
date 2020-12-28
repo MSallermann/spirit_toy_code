@@ -12,7 +12,7 @@ BreakBeforeBinaryOperators:           All
 BreakBeforeBraces:                    Allman
 BreakBeforeTernaryOperators:          false
 ContinuationIndentWidth:  4
-ColumnLimit:              200
+ColumnLimit:              150
 IndentCaseLabels:         true
 IndentWidth:              4
 PenaltyBreakComment:      10000000

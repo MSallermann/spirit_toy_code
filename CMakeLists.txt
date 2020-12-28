@@ -46,15 +46,13 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
-set( SRC 
+set( SRC
         ${PROJECT_SOURCE_DIR}/main.cpp
-        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cpu/backend_cpu.cpp
-        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cpu/Device_State.cpp
-        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cuda/backend_cuda.cu
-        ${PROJECT_SOURCE_DIR}/src/implementation/backend_cuda/Device_State.cu
         ${PROJECT_SOURCE_DIR}/src/interface/State.cpp
-        # ${PROJECT_SOURCE_DIR}/src/backend_vulkan/backend_vulkan.cpp
-        # ${PROJECT_SOURCE_DIR}/src/backend_vulkan/Device_State.cpp
+        ${PROJECT_SOURCE_DIR}/src/implementation/State.cpp
+        ${PROJECT_SOURCE_DIR}/src/interface/Method.cpp
+        ${PROJECT_SOURCE_DIR}/src/implementation/Kernels.cpu.cpp
+        ${PROJECT_SOURCE_DIR}/src/implementation/Kernels.cuda.cu
 )
 
 set( INCLUDE 
@@ -91,6 +89,8 @@ if (${CUDA_BACKEND})
 
                 set_source_files_properties( 
                         ${PROJECT_SOURCE_DIR}/src/interface/State.cpp
+                        ${PROJECT_SOURCE_DIR}/src/implementation/State.cpp
+                        ${PROJECT_SOURCE_DIR}/src/interface/Method.cpp
                         PROPERTIES LANGUAGE CUDA
                 )
         else()
@@ -98,10 +98,6 @@ if (${CUDA_BACKEND})
                 set(CUDA_BACKEND OFF)
         endif()
 endif()
-# if()
-#         message("Building VULKAN backend")
-#         set(COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS} -DBACKEND_VULKAN)
-# endif()
 
 # Additional definitions for all execs
 foreach(executable IN LISTS EXECUTABLE_NAMES)
