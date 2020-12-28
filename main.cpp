@@ -59,8 +59,8 @@ int main( int argc, char * argv[] )
     s.allocate();
     s.upload();
 
-    Interface::Method_Implementation * method = get_method_implementation( &s, Interface::MethodType::Minimisation );
-    Interface::Solver_Implementation * solver = get_solver_implementation( &s, Interface::SolverType::Gradient_Descent );
+    Interface::Method_Implementation * method = get_method_implementation( s, Interface::MethodType::Minimisation );
+    Interface::Solver_Implementation * solver = get_solver_implementation( s, Interface::SolverType::Gradient_Descent );
 
     Interface::Method m( method );
     m.set_solver( solver );

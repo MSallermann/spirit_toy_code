@@ -13,9 +13,11 @@ namespace Implementation
 
 class Solver_Gradient_Descent : public Interface::Solver_Implementation
 {
-    virtual void progagate_spins( Interface::State * state ) override
+public:
+    Solver_Gradient_Descent( Interface::State & state ) : Interface::Solver_Implementation( state ){};
+    virtual void progagate_spins( Interface::State & state ) override
     {
-        Kernels::propagate_spins( state->fields->spins.data(), state->fields->gradient.data(), state->solver_parameters, state->geometry );
+        Kernels::propagate_spins( state.fields->spins.data(), state.fields->gradient.data(), state.solver_parameters, state.geometry );
     };
 };
 

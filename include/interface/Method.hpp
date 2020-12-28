@@ -25,9 +25,13 @@ enum SolverType
 
 class Solver_Implementation
 {
+    Interface::State & state;
+
 public:
     SolverType m_type;
-    virtual void progagate_spins( Interface::State * state ) = 0;
+    Solver_Implementation( Interface::State & state ) : state( state ) {}
+    virtual void progagate_spins( Interface::State & state ) = 0;
+    virtual ~Solver_Implementation(){};
 };
 
 class Method_Implementation
@@ -35,25 +39,32 @@ class Method_Implementation
 protected:
     int m_iteration_step;
     MethodType m_type;
-    Solver_Implementation * m_solver;
+    Solver_Implementation * solver = nullptr;
     std::unordered_set<SolverType> eligible_solvers;
 
-    Interface::State * m_state_host;
-    Implementation::Fields * m_state;
+    Interface::State & state;
 
 public:
-    virtual ~Method_Implementation() {}
-    Method_Implementation( Interface::State * state ) : m_state_host( state ), m_state( state->fields ){};
+    virtual ~Method_Implementation()
+    {
+        if( solver != nullptr )
+        {
+            delete solver;
+        }
+    }
+
+    Method_Implementation( Interface::State & state ) : state( state ){};
     virtual void iterate( int N_iterations ) = 0;
+    // virtual void iteration()                              = 0;
+    // virtual void compose_iterations( int iteration_step ) = 0;
+
     virtual void set_solver( Solver_Implementation * solver )
     {
         if( eligible_solvers.find( solver->m_type ) != eligible_solvers.end() )
-            m_solver = solver;
+            this->solver = solver;
         else
             throw std::runtime_error( "Ineligible solver" );
     }
-    // virtual void iteration()                              = 0;
-    // virtual void compose_iterations( int iteration_step ) = 0;
 };
 
 class Method
@@ -64,7 +75,13 @@ protected:
 public:
     Method( Method_Implementation * implementation ) : m_implementation( implementation ) {}
 
-    virtual ~Method() {}
+    virtual ~Method()
+    {
+        if( m_implementation != nullptr )
+        {
+            delete m_implementation;
+        }
+    }
 
     virtual void set_solver( Solver_Implementation * solver )
     {
@@ -77,8 +94,8 @@ public:
     }
 };
 
-Solver_Implementation * get_solver_implementation( Interface::State * state, SolverType type );
-Method_Implementation * get_method_implementation( Interface::State * state, MethodType type );
+Solver_Implementation * get_solver_implementation( Interface::State & state, SolverType type );
+Method_Implementation * get_method_implementation( Interface::State & state, MethodType type );
 
 } // namespace Interface
 } // namespace Spirit
