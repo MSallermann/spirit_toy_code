@@ -71,7 +71,7 @@ H_ATTRIBUTE device_vector<T>::device_vector( const device_vector<T> & old_vector
     m_ptr  = new T[m_size];
 
 #pragma omp parallel for
-    for( size_t i = 0; i < m_size; i++ )
+    for( int i = 0; i < int( m_size ); i++ )
     {
         m_ptr[i] = old_vector.m_ptr[i];
     }
@@ -87,7 +87,7 @@ H_ATTRIBUTE device_vector<T> & device_vector<T>::operator=( const device_vector<
     m_ptr  = new T[m_size];
 
 #pragma omp parallel for
-    for( size_t i = 0; i < m_size; i++ )
+    for( int i = 0; i < int( m_size ); i++ )
     {
         m_ptr[i] = old_vector.m_ptr[i];
     }
@@ -104,7 +104,7 @@ H_ATTRIBUTE void device_vector<T>::copy_to( std::vector<T> & host_vector )
     if( host_vector.size() == this->size() )
     {
 #pragma omp parallel for
-        for( size_t i = 0; i < this->size(); i++ )
+        for( int i = 0; i < int( this->size() ); i++ )
         {
             host_vector[i] = ( this->m_ptr )[i];
         }
@@ -121,7 +121,7 @@ template<typename T>
 H_ATTRIBUTE void device_vector<T>::copy_to( T * host_ptr )
 {
 #pragma omp parallel for
-    for( size_t i = 0; i < this->size(); i++ )
+    for( int i = 0; i < int( this->size() ); i++ )
     {
         host_ptr[i] = ( this->m_ptr )[i];
     }
@@ -137,7 +137,7 @@ H_ATTRIBUTE void device_vector<T>::copy_from( const std::vector<T> & host_vector
     if( host_vector.size() == this->size() )
     {
 #pragma omp parallel for
-        for( size_t i = 0; i < this->size(); i++ )
+        for( int i = 0; i < int( this->size() ); i++ )
         {
             ( this->m_ptr )[i] = host_vector[i];
         }
@@ -154,7 +154,7 @@ template<typename T>
 H_ATTRIBUTE void device_vector<T>::copy_from( T * host_ptr )
 {
 #pragma omp parallel for
-    for( size_t i = 0; i < this->size(); i++ )
+    for( int i = 0; i < int( this->size() ); i++ )
     {
         ( this->m_ptr )[i] = host_ptr[i];
     }
