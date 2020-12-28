@@ -32,7 +32,7 @@ int main( int argc, char * argv[] )
     int n_cell_atoms           = Nbasis;
     Spirit::Interface::State s = Spirit::Interface::State( n_cells, n_cell_atoms );
 
-    using EDt = Implementation::Stencil<2, Matrix3>;
+    using EDt = Interface::Stencil<2, Matrix3>;
     std::vector<EDt> ed_stencils;
 
     Matrix3 matrix;
@@ -45,7 +45,7 @@ int main( int argc, char * argv[] )
     ed_stencils.push_back( EDt( 0, { 0 }, { 0 }, { 0 }, { -1 }, matrix ) );
     s.hamiltonian.ed_stencils = ed_stencils;
 
-    using Kt = Implementation::Stencil<1, Vector3>;
+    using Kt = Interface::Stencil<1, Vector3>;
     std::vector<Kt> k_stencils;
     Vector3 vec = Vector3::Identity();
     k_stencils.push_back( Kt( 0, {}, {}, {}, {}, vec ) );
@@ -59,10 +59,10 @@ int main( int argc, char * argv[] )
     s.allocate();
     s.upload();
 
-    Method_Implementation * method = get_method_implementation( &s, MethodType::Minimisation );
-    Solver_Implementation * solver = get_solver_implementation( &s, SolverType::Gradient_Descent );
+    Interface::Method_Implementation * method = get_method_implementation( &s, Interface::MethodType::Minimisation );
+    Interface::Solver_Implementation * solver = get_solver_implementation( &s, Interface::SolverType::Gradient_Descent );
 
-    Method m( method );
+    Interface::Method m( method );
     m.set_solver( solver );
 
     std::cout << "Sart Iterations\n";

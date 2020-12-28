@@ -4,6 +4,8 @@
 
 namespace Spirit
 {
+namespace Interface
+{
 
 Solver_Implementation * get_solver_implementation( Interface::State * state, SolverType type )
 {
@@ -29,4 +31,5 @@ Method_Implementation * get_method_implementation( Interface::State * state, Met
     }
 }
 
+} // namespace Interface
 } // namespace Spirit

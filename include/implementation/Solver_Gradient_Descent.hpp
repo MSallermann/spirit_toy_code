@@ -10,7 +10,7 @@ namespace Spirit
 namespace Implementation
 {
 
-class Solver_Gradient_Descent : public Solver_Implementation
+class Solver_Gradient_Descent : public Interface::Solver_Implementation
 {
     virtual void progagate_spins( Implementation::State * state ) override
     {

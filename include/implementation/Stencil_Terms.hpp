@@ -10,14 +10,14 @@ namespace Implementation
 {
 
 template<int N, typename PARAM>
-struct StencilImp : public Stencil<N, PARAM>
+struct StencilImp : public Interface::Stencil<N, PARAM>
 {
     using Vector3NArray = Vector3[N];
     StencilImp()        = default;
     StencilImp( int i, std::array<int, N - 1> j, std::array<int, N - 1> da, std::array<int, N - 1> db, std::array<int, N - 1> dc, PARAM param )
-            : Stencil<N, PARAM>( i, j, da, db, dc, param ){};
+            : Interface::Stencil<N, PARAM>( i, j, da, db, dc, param ){};
 
-    H_ATTRIBUTE void read_from_host( const Spirit::Implementation::Stencil<N, PARAM> & interface_stencil )
+    H_ATTRIBUTE void read_from_host( const Spirit::Interface::Stencil<N, PARAM> & interface_stencil )
     {
         this->i     = interface_stencil.i;
         this->j     = interface_stencil.j;

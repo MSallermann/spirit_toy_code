@@ -10,12 +10,12 @@ namespace Spirit
 namespace Implementation
 {
 
-class Method_Minimize : public Method_Implementation
+class Method_Minimize : public Interface::Method_Implementation
 {
 public:
     Method_Minimize( Interface::State * state ) : Method_Implementation( state )
     {
-        this->eligible_solvers.insert( SolverType::Gradient_Descent );
+        this->eligible_solvers.insert( Interface::SolverType::Gradient_Descent );
     }
 
     void iterate( int N_iterations ) override

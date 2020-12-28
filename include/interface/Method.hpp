@@ -8,6 +8,8 @@
 
 namespace Spirit
 {
+namespace Interface
+{
 
 enum MethodType
 {
@@ -78,5 +80,6 @@ public:
 Solver_Implementation * get_solver_implementation( Interface::State * state, SolverType type );
 Method_Implementation * get_method_implementation( Interface::State * state, MethodType type );
 
+} // namespace Interface
 } // namespace Spirit
 #endif
