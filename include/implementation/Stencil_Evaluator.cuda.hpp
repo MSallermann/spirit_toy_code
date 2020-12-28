@@ -1,9 +1,10 @@
+#ifdef BACKEND_CUDA
 #pragma once
 #ifndef IMPLEMENTATION_STENCIL_EVALUATOR_CUDA_HPP
 #define IMPLEMENTATION_STENCIL_EVALUATOR_CUDA_HPP
 
 #include "implementation/State.hpp"
-#include "implementation/backend_cpu/cpu_helper_functions.hpp"
+#include "implementation/backend_cuda/cuda_helper_functions.hpp"
 
 namespace Spirit
 {
@@ -11,7 +12,7 @@ namespace Device
 {
 
 template<typename Stencil>
-__global__ void __stencil_gradient( State state, int N_Stencil, Stencil * stencils )
+__global__ void __stencil_gradient( Vector3 * gradient, Vector3 * spins, State_Pod state, int N_Stencil, Stencil * stencils )
 {
     int index  = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
@@ -34,7 +35,7 @@ __global__ void __stencil_gradient( State state, int N_Stencil, Stencil * stenci
 
             // Allocate data for interacting spins
             Vector3 interaction_spins[Stencil::N_interaction];
-            interaction_spins[0] = state.spins[idx_i];
+            interaction_spins[0] = spins[idx_i];
 
             for( int p = 0; p < N_Stencil; p++ )
             {
@@ -49,14 +50,14 @@ __global__ void __stencil_gradient( State state, int N_Stencil, Stencil * stenci
                                               + Na * ( b + stencil.get_db( idx_interaction ) + Nb * ( c + stencil.get_dc( idx_interaction ) ) ) );
                         if( idx_j >= 0 && idx_j < state.nos )
                         {
-                            interaction_spins[idx_interaction + 1] = state.spins[idx_j];
+                            interaction_spins[idx_interaction + 1] = spins[idx_j];
                         }
                         else
                         {
                             interaction_spins[idx_interaction + 1] = { 0, 0, 0 };
                         }
                     }
-                    state.gradient[idx_i] += stencil.gradient( interaction_spins );
+                    gradient[idx_i] += stencil.gradient( interaction_spins );
                 }
             }
         }
@@ -64,14 +65,15 @@ __global__ void __stencil_gradient( State state, int N_Stencil, Stencil * stenci
 }
 
 template<typename Stencil>
-void stencil_gradient( State state, int N_Stencil, Stencil * stencils )
+void stencil_gradient( Vector3 * gradient, Vector3 * spins, State_Pod & state, int N_Stencil, Stencil * stencils )
 {
     int blockSize = 1024;
     int numBlocks = ( state.n_cells_total + blockSize - 1 ) / blockSize;
-    __stencil_gradient<<<numBlocks, blockSize>>>( state, N_Stencil, stencils );
+    __stencil_gradient<<<numBlocks, blockSize>>>( gradient, spins, state, N_Stencil, stencils );
 }
 
 } // namespace Device
 } // namespace Spirit
 
+#endif
 #endif

@@ -1,3 +1,5 @@
+#ifdef BACKEND_CPU
+
 #pragma once
 #ifndef IMPLEMENTATION_STENCIL_EVALUATOR_CPU_HPP
 #define IMPLEMENTATION_STENCIL_EVALUATOR_CPU_HPP
@@ -11,11 +13,10 @@ namespace Device
 {
 
 template<typename Stencil>
-void stencil_gradient( device_vector<Vector3> & gradient, State & state, int N_Stencil, Stencil * stencils )
+void stencil_gradient( Vector3 * gradient, Vector3 * spins, State_Pod & state, int N_Stencil, Stencil * stencils )
 {
     int Na = state.n_cells[0];
     int Nb = state.n_cells[1];
-    // int Nc = state.n_cells[2]; Not needed
 
 #pragma omp parallel for
     for( int i_cell = 0; i_cell < state.n_cells_total; i_cell++ )
@@ -32,7 +33,7 @@ void stencil_gradient( device_vector<Vector3> & gradient, State & state, int N_S
 
             // Allocate data for interacting spins
             Vector3 interaction_spins[Stencil::N_interaction];
-            interaction_spins[0] = state.spins[idx_i];
+            interaction_spins[0] = spins[idx_i];
 
             for( int p = 0; p < N_Stencil; p++ )
             {
@@ -47,7 +48,7 @@ void stencil_gradient( device_vector<Vector3> & gradient, State & state, int N_S
                                               + Na * ( b + stencil.get_db( idx_interaction ) + Nb * ( c + stencil.get_dc( idx_interaction ) ) ) );
                         if( idx_j >= 0 && idx_j < state.nos )
                         {
-                            interaction_spins[idx_interaction + 1] = state.spins[idx_j];
+                            interaction_spins[idx_interaction + 1] = spins[idx_j];
                         }
                         else
                         {
@@ -63,5 +64,7 @@ void stencil_gradient( device_vector<Vector3> & gradient, State & state, int N_S
 
 } // namespace Device
 } // namespace Spirit
+
+#endif
 
 #endif

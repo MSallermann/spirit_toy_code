@@ -23,8 +23,9 @@ public:
 
         for( int iter = 0; iter < N_iterations; iter++ )
         {
-            Kernels::set_gradient_zero( m_state );
-            m_state->Gradient_Async( m_state->gradient );
+
+            Kernels::set_gradient_zero( m_state->gradient.data(), m_state->pod );
+            m_state->Gradient_Async( m_state->gradient.data(), m_state->spins.data(), m_state->pod );
             m_solver->progagate_spins( m_state );
 
             if( iter % 250 == 0 )
