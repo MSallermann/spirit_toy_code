@@ -54,7 +54,7 @@ int main( int argc, char * argv[] )
     std::vector<Kt> b_stencils;
     b_stencils.push_back( Kt( 0, {}, {}, {}, {}, vec ) );
     s.hamiltonian.b_stencils = b_stencils;
-    s.Set_Domain( { 2, 2, 2 } );
+    s.set_domain( { 2, 2, 2 } );
 
     s.allocate();
     s.upload();

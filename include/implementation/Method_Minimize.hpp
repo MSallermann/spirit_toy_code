@@ -25,7 +25,7 @@ public:
         {
 
             Kernels::set_gradient_zero( m_state->gradient.data(), m_state->pod );
-            m_state->Gradient_Async( m_state->gradient.data(), m_state->spins.data(), m_state->pod );
+            m_state->get_gradient( m_state->gradient.data(), m_state->spins.data(), m_state->pod );
             m_solver->progagate_spins( m_state );
 
             if( iter % 250 == 0 )

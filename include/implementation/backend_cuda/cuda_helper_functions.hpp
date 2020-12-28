@@ -4,12 +4,12 @@
 
 #include <vector>
 
-#define gpuErrchk( ans )                                                                                                                             \
+#define gpu_errchk( ans )                                                                                                                            \
     {                                                                                                                                                \
-        gpuAssert( ( ans ), __FILE__, __LINE__, __FUNCTION__ );                                                                                      \
+        gpu_assert( ( ans ), __FILE__, __LINE__, __FUNCTION__ );                                                                                     \
     }
 
-inline void gpuAssert( cudaError_t code, const char * file, int line, const char * function, bool abort = true )
+inline void gpu_assert( cudaError_t code, const char * file, int line, const char * function, bool abort = true )
 {
     if( code != cudaSuccess )
     {
@@ -31,49 +31,49 @@ template<typename T>
 void malloc_n( T *& dev_ptr, size_t N )
 {
     auto err = cudaMalloc( &dev_ptr, N * sizeof( T ) );
-    gpuErrchk( err );
+    gpu_errchk( err );
 }
 
 template<typename T, typename Vec>
 void copy_vector_H2D( T * dest_dev_ptr, Vec & src_host_vec )
 {
     auto err = cudaMemcpy( dest_dev_ptr, src_host_vec.data(), src_host_vec.size() * sizeof( T ), cudaMemcpyHostToDevice );
-    gpuErrchk( err );
+    gpu_errchk( err );
 }
 
 template<typename T, typename Vec>
 void copy_vector_D2H( Vec & dest_host_vec, T * src_dev_ptr )
 {
     auto err = cudaMemcpy( dest_host_vec.data(), src_dev_ptr, dest_host_vec.size() * sizeof( T ), cudaMemcpyDeviceToHost );
-    gpuErrchk( err );
+    gpu_errchk( err );
 }
 
 template<typename T>
 void copy_D2H( T * dest_host_ptr, T * src_dev_ptr )
 {
     auto err = cudaMemcpy( dest_host_ptr, src_dev_ptr, sizeof( T ), cudaMemcpyDeviceToHost );
-    gpuErrchk( err );
+    gpu_errchk( err );
 }
 
 template<typename T>
 void copy_n_D2H( T * dest_host_ptr, T * src_dev_ptr, size_t n )
 {
     auto err = cudaMemcpy( dest_host_ptr, src_dev_ptr, n * sizeof( T ), cudaMemcpyDeviceToHost );
-    gpuErrchk( err );
+    gpu_errchk( err );
 }
 
 template<typename T>
 void copy_H2D( T * dest_dev_ptr, T * src_host_ptr )
 {
     auto err = cudaMemcpy( dest_dev_ptr, src_host_ptr, sizeof( T ), cudaMemcpyHostToDevice );
-    gpuErrchk( err );
+    gpu_errchk( err );
 }
 
 template<typename T>
 void copy_n_H2D( T * dest_dev_ptr, T * src_host_ptr, size_t n )
 {
     auto err = cudaMemcpy( dest_dev_ptr, src_host_ptr, n * sizeof( T ), cudaMemcpyHostToDevice );
-    gpuErrchk( err );
+    gpu_errchk( err );
 }
 
 template<typename T>

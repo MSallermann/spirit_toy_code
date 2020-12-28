@@ -33,7 +33,7 @@ public:
     {
     }
 
-    void Set_Domain( const Vector3 & vec )
+    void set_domain( const Vector3 & vec )
     {
 #pragma omp parallel for
         for( int i = 0; i < nos; i++ )

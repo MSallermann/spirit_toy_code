@@ -6,7 +6,7 @@ namespace Spirit
 namespace Implementation
 {
 
-void State::Gradient_Async( Vector3 * gradient, Vector3 * spins, State_Pod & state_pod )
+void State::get_gradient( Vector3 * gradient, Vector3 * spins, State_Pod & state_pod )
 {
     if( hamiltonian.ed_stencils.size() > 0 )
     {

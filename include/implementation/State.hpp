@@ -43,8 +43,7 @@ public:
     Hamiltonian hamiltonian;
 
     State * device_handle;
-    void Create_Device_Handle();
-    void Gradient_Async( Vector3 * gradient, Vector3 * spins, State_Pod & state_pod );
+    void get_gradient( Vector3 * gradient, Vector3 * spins, State_Pod & state_pod );
 };
 
 } // namespace Implementation
