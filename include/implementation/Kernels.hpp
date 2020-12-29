@@ -13,17 +13,6 @@ namespace Kernels
 
 void set_gradient_zero( Vector3 * gradient, Interface::State::Geometry & geometry );
 
-struct Sum_Configuration
-{
-    size_t temp_storage_bytes;
-    void * temp_storage;
-    static Sum_Configuration none()
-    {
-        return Sum_Configuration{ 0, nullptr };
-    }
-    ~Sum_Configuration();
-};
-
 struct Summator
 {
     int N;
