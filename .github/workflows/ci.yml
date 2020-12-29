@@ -35,4 +35,4 @@ jobs:
     - name: test
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: ctest --verbose
+      run: ctest --verbose -C $BUILD_TYPE
