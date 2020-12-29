@@ -3,9 +3,9 @@
 #include <chrono>
 #include <iostream>
 
-#include "interface/Method.hpp"
-#include "interface/State.hpp"
-#include "interface/Stencil.hpp"
+#include "Method.hpp"
+#include "State.hpp"
+#include "Stencil.hpp"
 
 using namespace Spirit;
 constexpr int N_iterations = 500;
