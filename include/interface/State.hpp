@@ -33,6 +33,7 @@ public:
     struct Solver_Parameters
     {
         scalar timestep;
+        int n_output;
     };
 
     Implementation::Fields * fields                  = nullptr;

@@ -28,7 +28,7 @@ public:
             state.hamiltonian_device->get_gradient( state.fields->gradient.data(), state.fields->spins.data(), state.geometry );
             solver->progagate_spins( state );
 
-            if( iter % 250 == 0 )
+            if( iter % state.solver_parameters.n_output == 0 )
             {
                 state.download();
                 printf( "iter = %i\n", iter );
@@ -36,6 +36,10 @@ public:
                 std::cout << "    gradient[0,0,0] = " << state.gradient[0].transpose() << "\n";
             }
         }
+        state.download();
+        printf( "Minimize finished\n" );
+        std::cout << "    spin[0,0,0]     = " << state.spins[0].transpose() << "\n";
+        std::cout << "    gradient[0,0,0] = " << state.gradient[0].transpose() << "\n";
     }
 };
 

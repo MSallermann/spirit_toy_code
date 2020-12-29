@@ -55,7 +55,7 @@ int main( int argc, char * argv[] )
     b_stencils.push_back( Kt( 0, {}, {}, {}, {}, vec ) );
     s.hamiltonian.b_stencils = b_stencils;
     s.set_domain( { 2, 2, 2 } );
-
+    s.solver_parameters.n_output = 250;
     s.allocate();
     s.upload();
 
