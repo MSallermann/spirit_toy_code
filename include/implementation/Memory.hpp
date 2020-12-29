@@ -99,6 +99,8 @@ public:
 
     H_ATTRIBUTE device_vector( size_t N );
 
+    H_ATTRIBUTE device_vector( size_t N, const T & value );
+
     H_ATTRIBUTE device_vector( const device_vector<T> & old_vector );
 
     H_ATTRIBUTE device_vector & operator=( const device_vector<T> & old_vector );
@@ -133,6 +135,16 @@ H_ATTRIBUTE device_vector<T>::device_vector( size_t N )
 {
     m_ptr  = new T[N];
     m_size = N;
+}
+
+template<typename T>
+H_ATTRIBUTE device_vector<T>::device_vector( size_t N, const T & value ) : device_vector<T>( N )
+{
+#pragma omp parallel for
+    for( int i = 0; i < int( m_size ); i++ )
+    {
+        m_ptr[i] = value;
+    }
 }
 
 template<typename T>
@@ -258,6 +270,22 @@ H_ATTRIBUTE device_vector<T>::device_vector( size_t N )
 {
     CUDA_HELPER::malloc_n( m_ptr, N );
     m_size = N;
+}
+
+template<typename T>
+__global__ void __cu_set( T * m_ptr, size_t N, T value )
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if( idx < N )
+        m_ptr[idx] = value;
+}
+
+template<typename T>
+H_ATTRIBUTE device_vector<T>::device_vector( size_t N, const T & value ) : device_vector<T>( N )
+{
+    int blockSize = 1024;
+    int numBlocks = ( N + blockSize - 1 ) / blockSize;
+    __cu_set<<<blockSize, numBlocks>>>( m_ptr, N, value );
 }
 
 template<typename T>
