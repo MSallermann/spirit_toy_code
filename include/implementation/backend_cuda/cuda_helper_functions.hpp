@@ -35,42 +35,42 @@ void malloc_n( T *& dev_ptr, size_t N )
 }
 
 template<typename T, typename Vec>
-void copy_vector_H2D( T * dest_dev_ptr, Vec & src_host_vec )
+void copy_vector_H2D( T * dest_dev_ptr, const Vec & src_host_vec )
 {
     auto err = cudaMemcpy( dest_dev_ptr, src_host_vec.data(), src_host_vec.size() * sizeof( T ), cudaMemcpyHostToDevice );
     gpu_errchk( err );
 }
 
 template<typename T, typename Vec>
-void copy_vector_D2H( Vec & dest_host_vec, T * src_dev_ptr )
+void copy_vector_D2H( Vec & dest_host_vec, const T * src_dev_ptr )
 {
     auto err = cudaMemcpy( dest_host_vec.data(), src_dev_ptr, dest_host_vec.size() * sizeof( T ), cudaMemcpyDeviceToHost );
     gpu_errchk( err );
 }
 
 template<typename T>
-void copy_D2H( T * dest_host_ptr, T * src_dev_ptr )
+void copy_D2H( T * dest_host_ptr, const T * src_dev_ptr )
 {
     auto err = cudaMemcpy( dest_host_ptr, src_dev_ptr, sizeof( T ), cudaMemcpyDeviceToHost );
     gpu_errchk( err );
 }
 
 template<typename T>
-void copy_n_D2H( T * dest_host_ptr, T * src_dev_ptr, size_t n )
+void copy_n_D2H( T * dest_host_ptr, const T * src_dev_ptr, size_t n )
 {
     auto err = cudaMemcpy( dest_host_ptr, src_dev_ptr, n * sizeof( T ), cudaMemcpyDeviceToHost );
     gpu_errchk( err );
 }
 
 template<typename T>
-void copy_H2D( T * dest_dev_ptr, T * src_host_ptr )
+void copy_H2D( T * dest_dev_ptr, const T * src_host_ptr )
 {
     auto err = cudaMemcpy( dest_dev_ptr, src_host_ptr, sizeof( T ), cudaMemcpyHostToDevice );
     gpu_errchk( err );
 }
 
 template<typename T>
-void copy_n_H2D( T * dest_dev_ptr, T * src_host_ptr, size_t n )
+void copy_n_H2D( T * dest_dev_ptr, const T * src_host_ptr, size_t n )
 {
     auto err = cudaMemcpy( dest_dev_ptr, src_host_ptr, n * sizeof( T ), cudaMemcpyHostToDevice );
     gpu_errchk( err );
