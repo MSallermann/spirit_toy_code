@@ -16,6 +16,77 @@ namespace Implementation
 {
 
 template<typename T>
+class device_type
+{
+private:
+    T m_value;
+    T * m_ptr = nullptr;
+
+public:
+    device_type()
+    {
+#ifdef BACKEND_CUDA
+        CUDA_HELPER::malloc_n( m_ptr, 1 );
+#endif
+    }
+
+    device_type( const T & value ) : device_type()
+    {
+        upload( value );
+    }
+
+    HD_ATTRIBUTE T * data()
+    {
+#ifdef BACKEND_CPU
+        return &m_value;
+#else
+        return m_ptr;
+#endif
+    }
+
+    H_ATTRIBUTE device_type & operator=( const device_type<T> & other )
+    {
+#ifdef BACKEND_CPU
+        m_value = other.value;
+#else
+        cudaMemcpy( m_ptr, other.m_ptr, sizeof( T ), cudaMemcpyDeviceToDevice );
+        return *this;
+#endif
+    }
+
+    H_ATTRIBUTE void upload( const T & value )
+    {
+#ifdef BACKEND_CPU
+        m_value = value;
+#else
+        CUDA_HELPER::copy_H2D( m_ptr, &value );
+#endif
+    }
+
+    H_ATTRIBUTE T download()
+    {
+#ifdef BACKEND_CPU
+        return m_value;
+#else
+        CUDA_HELPER::copy_D2H( &m_value, m_ptr );
+        return m_value;
+#endif
+    }
+
+    H_ATTRIBUTE ~device_type()
+    {
+        if( m_ptr != nullptr )
+        {
+#ifdef BACKEND_CPU
+            delete m_ptr;
+#else
+            CUDA_HELPER::free( m_ptr );
+#endif
+        }
+    }
+};
+
+template<typename T>
 class device_vector
 {
 protected:
