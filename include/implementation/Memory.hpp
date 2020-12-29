@@ -163,11 +163,13 @@ H_ATTRIBUTE device_vector<T>::device_vector( const device_vector<T> & old_vector
 template<typename T>
 H_ATTRIBUTE device_vector<T> & device_vector<T>::operator=( const device_vector<T> & old_vector )
 {
-    if( this->m_ptr != nullptr )
-        delete[] m_ptr;
-
-    m_size = old_vector.size();
-    m_ptr  = new T[m_size];
+    if( this->m_size != old_vector.size() )
+    {
+        m_size = old_vector.size();
+        if( this->m_ptr != nullptr )
+            delete[] m_ptr;
+        m_ptr = new T[m_size];
+    }
 
 #pragma omp parallel for
     for( int i = 0; i < int( m_size ); i++ )
@@ -299,11 +301,14 @@ H_ATTRIBUTE device_vector<T>::device_vector( const device_vector<T> & old_vector
 template<typename T>
 H_ATTRIBUTE device_vector<T> & device_vector<T>::operator=( const device_vector<T> & old_vector )
 {
-    if( this->m_ptr != nullptr )
-        CUDA_HELPER::free( m_ptr );
-    m_size = old_vector.size();
-    CUDA_HELPER::malloc_n( m_ptr, m_size );
-    cudaMemcpy( m_ptr, old_vector.m_ptr, m_size * sizeof( T ), cudaMemcpyDeviceToDevice );
+    if( this->m_size != old_vector.size() )
+    {
+        m_size = old_vector.size();
+        if( this->m_ptr != nullptr )
+            CUDA_HELPER::free( m_ptr );
+        CUDA_HELPER::malloc_n( m_ptr, m_size );
+    }
+    cudaMemcpyAsync( m_ptr, old_vector.m_ptr, m_size * sizeof( T ), cudaMemcpyDeviceToDevice );
     return *this;
 }
 
