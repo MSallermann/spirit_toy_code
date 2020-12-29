@@ -69,7 +69,7 @@ scalar Summator::download_last_result()
 
 void dot( scalar * result, Vector3 * vf1, Vector3 * vf2, int N )
 {
-    Lambda::apply( N, [result, vf1, vf2] SIRIT_LAMBDA( int idx ) { result[idx] = vf1[idx].dot( vf2[idx] ); } );
+    Lambda::apply( N, [result, vf1, vf2] SPIRIT_LAMBDA( int idx ) { result[idx] = vf1[idx].dot( vf2[idx] ); } );
 }
 
 void propagate_spins(

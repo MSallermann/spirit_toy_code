@@ -7,7 +7,7 @@
 #ifdef BACKEND_CUDA
 #include "implementation/backend_cuda/cuda_helper_functions.hpp"
 // #include <cub/cub.cuh>
-#define SIRIT_LAMBDA __device__
+#define SPIRIT_LAMBDA __device__
 #else
 #define SPIRIT_LAMBDA
 #endif
