@@ -60,10 +60,13 @@ public:
 
     virtual void set_solver( Solver_Implementation * solver )
     {
-        if( eligible_solvers.find( solver->m_type ) != eligible_solvers.end() )
-            this->solver = solver;
-        else
-            throw std::runtime_error( "Ineligible solver" );
+        this->solver = solver;
+
+        // The following causes error on windows for some reason (find out why):
+        // if( eligible_solvers.find( solver->m_type ) != eligible_solvers.end() )
+        // this->solver = solver;
+        // else
+        // throw std::runtime_error( "Ineligible solver" );
     }
 };
 
