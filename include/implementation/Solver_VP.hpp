@@ -58,6 +58,7 @@ public:
         summator.sum( force_norm2.data(), dot.data() );
 
         Lambda::apply( 1, [r = ratio.data(), f = force_norm2.data(), p = projection.data()] SPIRIT_LAMBDA( int idx ) { r[0] = p[0] / f[0]; } );
+
         Lambda::apply( state.geometry.nos, [velocity, force, r = ratio.data(), p = projection.data()] SPIRIT_LAMBDA( int idx ) {
             if( p[0] <= 0 )
             {
@@ -80,10 +81,8 @@ public:
         auto force_pr    = forces_previous.data();
         auto velocity_pr = velocities_previous.data();
 
-        Lambda::apply( state.geometry.nos, [force, force_pr, velocity, velocity_pr] SPIRIT_LAMBDA( int idx ) {
-            force_pr[idx]    = force[idx];
-            velocity_pr[idx] = velocity[idx];
-        } );
+        forces_previous     = state.fields->gradient;
+        velocities_previous = velocities;
     }
 };
 
