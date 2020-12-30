@@ -19,6 +19,7 @@ class Solver_VP : public Interface::Solver_Implementation
     device_vector<Vector3> velocities_previous;
     device_vector<Vector3> forces_previous;
     device_vector<scalar> dot;
+    device_vector<scalar> force_norm2_vec;
     device_type<scalar> projection;
     device_type<scalar> force_norm2;
     device_type<scalar> ratio;
@@ -32,6 +33,7 @@ public:
               velocities_previous( state.geometry.nos, { 0, 0, 0 } ),
               forces_previous( state.geometry.nos, { 0, 0, 0 } ),
               dot( state.geometry.nos, 0 ),
+              force_norm2_vec( state.geometry.nos, 0 ),
               projection( 0 ),
               force_norm2( 0 ),
               summator( Kernels::Summator( state.geometry.nos ) ),
@@ -43,30 +45,31 @@ public:
         auto force      = state.fields->gradient.data();
         auto force_prev = forces_previous.data();
         auto m          = this->m;
+        scalar * d      = dot.data();
+        scalar * fnorm2 = force_norm2_vec.data();
 
         // Calculate the new velocity
-        Lambda::apply( state.geometry.nos, [force, force_prev, velocity, m] SPIRIT_LAMBDA( int idx ) {
+
+        Lambda::apply( state.geometry.nos, [force, force_prev, velocity, m, d, fnorm2] SPIRIT_LAMBDA( int idx ) {
             velocity[idx] += 0.5 / m * ( force_prev[idx] + force[idx] );
+            d[idx]      = velocity[idx].dot( force[idx] );
+            fnorm2[idx] = force[idx].squaredNorm();
         } );
 
         // Get the projection of the velocity on the force
-        Kernels::dot( dot.data(), velocity, force, state.geometry.nos );
         summator.sum( projection.data(), dot.data() );
-
         // Get the squared norm of the force
-        Kernels::dot( dot.data(), force, force, state.geometry.nos );
-        summator.sum( force_norm2.data(), dot.data() );
+        summator.sum( force_norm2.data(), force_norm2_vec.data() );
 
-        Lambda::apply( 1, [r = ratio.data(), f = force_norm2.data(), p = projection.data()] SPIRIT_LAMBDA( int idx ) { r[0] = p[0] / f[0]; } );
-
-        Lambda::apply( state.geometry.nos, [velocity, force, r = ratio.data(), p = projection.data()] SPIRIT_LAMBDA( int idx ) {
-            if( p[0] <= 0 )
+        Lambda::apply( state.geometry.nos, [velocity, force, f2 = force_norm2.data(), p = projection.data()] SPIRIT_LAMBDA( int idx ) {
+            scalar ratio = *p / *f2;
+            if( *p <= 0 )
             {
                 velocity[idx] = { 0, 0, 0 };
             }
             else
             {
-                velocity[idx] = force[idx] * r[0];
+                velocity[idx] = force[idx] * ratio;
             }
         } );
 
