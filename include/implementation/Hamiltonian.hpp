@@ -16,12 +16,10 @@ class Hamiltonian
 {
 public:
     Hamiltonian( Spirit::Interface::Hamiltonian * ham )
-            : boundary_conditions( ham->boundary_conditions ),
-              ed_stencils( device_vector<ED_Stencil>( ham->ed_stencils.size() ) ),
+            : ed_stencils( device_vector<ED_Stencil>( ham->ed_stencils.size() ) ),
               k_stencils( device_vector<K_Stencil>( ham->k_stencils.size() ) ),
               b_stencils( device_vector<Bfield_Stencil>( ham->b_stencils.size() ) )
     {
-
         auto ptr_ed = (ED_Stencil *)( ham->ed_stencils.data() );
         ed_stencils.copy_from( ptr_ed );
 
@@ -48,7 +46,6 @@ public:
         }
     }
 
-    std::array<bool, 3> boundary_conditions;
     device_vector<ED_Stencil> ed_stencils;
     device_vector<K_Stencil> k_stencils;
     device_vector<Bfield_Stencil> b_stencils;

@@ -30,7 +30,7 @@ int main( int argc, char * argv[] )
 
     std::array<int, 3> n_cells = { Na, Nb, Nc };
     int n_cell_atoms           = Nbasis;
-    Spirit::Interface::State s = Spirit::Interface::State( n_cells, n_cell_atoms );
+    Spirit::Interface::State s = Spirit::Interface::State( n_cells, n_cell_atoms, { true, true, true } );
 
     using EDt = Interface::Stencil<2, Matrix3>;
     std::vector<EDt> ed_stencils;
@@ -60,7 +60,8 @@ int main( int argc, char * argv[] )
     s.upload();
 
     Interface::Method_Implementation * method = get_method_implementation( s, Interface::MethodType::Minimisation );
-    Interface::Solver_Implementation * solver = get_solver_implementation( s, Interface::SolverType::Gradient_Descent );
+    // Interface::Solver_Implementation * solver = get_solver_implementation( s, Interface::SolverType::Gradient_jDescent );
+    Interface::Solver_Implementation * solver = get_solver_implementation( s, Interface::SolverType::VP );
 
     Interface::Method m( method );
     m.set_solver( solver );

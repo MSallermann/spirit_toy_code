@@ -24,10 +24,22 @@ class State
 public:
     struct Geometry
     {
+        Geometry( const std::array<int, 3> & n_cells, int n_cell_atoms, const std::array<bool, 3> & boundary_conditions )
+                : n_cells{ n_cells[0], n_cells[1], n_cells[2] },
+                  n_cell_atoms( n_cell_atoms ),
+                  boundary_conditions{ boundary_conditions[0], boundary_conditions[1], boundary_conditions[2] }
+        {
+            n_cells_total = n_cells[0] * n_cells[1] * n_cells[2];
+            nos           = n_cells_total * n_cell_atoms;
+        }
+
         int n_cells[3];
         int n_cell_atoms;
-        int nos;
+        bool boundary_conditions[3];
+
+        // Derived information for convenience
         int n_cells_total;
+        int nos;
     };
 
     struct Solver_Parameters
@@ -39,15 +51,18 @@ public:
     Implementation::Fields * fields                  = nullptr;
     Implementation::Hamiltonian * hamiltonian_device = nullptr;
 
-    State( std::array<int, 3> n_cells, int n_cell_atoms )
+    State( std::array<int, 3> n_cells, int n_cell_atoms, std::array<bool, 3> boundary_conditions )
+            : geometry( n_cells, n_cell_atoms, boundary_conditions )
     {
+        // bool boundary_conditions[3] = { true, true, true };
         // Initialize geometry
-        geometry.n_cells[0]    = n_cells[0];
-        geometry.n_cells[1]    = n_cells[1];
-        geometry.n_cells[2]    = n_cells[2];
-        geometry.n_cell_atoms  = n_cell_atoms;
-        geometry.n_cells_total = n_cells[0] * n_cells[1] * n_cells[2];
-        geometry.nos           = n_cell_atoms * geometry.n_cells_total;
+        // geometry               = Geometry( n_cells, n_cell_atoms, boundary_conditions );
+        // geometry.n_cells[0]    = n_cells[0];
+        // geometry.n_cells[1]    = n_cells[1];
+        // geometry.n_cells[2]    = n_cells[2];
+        // geometry.n_cell_atoms  = n_cell_atoms;
+        // geometry.n_cells_total = n_cells[0] * n_cells[1] * n_cells[2];
+        // geometry.nos           = n_cell_atoms * geometry.n_cells_total;
 
         // Initialize solver parameters
         solver_parameters.timestep = 1e-3;
@@ -78,7 +93,7 @@ public:
     void upload();
     void download();
     ~State();
-};
+}; // namespace Interface
 
 } // namespace Interface
 } // namespace Spirit
