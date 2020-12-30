@@ -144,6 +144,7 @@ if(BUILD_TESTS)
                 set(library ${META_PROJECT_NAME}_${CURRENT_SUFFIX}_static)
                 add_framework_test( test_kernels_${CURRENT_SUFFIX} ${PROJECT_SOURCE_DIR}/tests/test_kernels.cpp ${library} )
                 add_framework_test( test_device_kernel_${CURRENT_SUFFIX} ${PROJECT_SOURCE_DIR}/tests/test_device_vector.cpp ${library} )
+                add_framework_test( test_stencil_evaluator_${CURRENT_SUFFIX} ${PROJECT_SOURCE_DIR}/tests/test_stencil_evaluator.cpp ${library} )
         endforeach()
 
 endif()

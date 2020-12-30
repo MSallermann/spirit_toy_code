@@ -18,6 +18,7 @@ void stencil_gradient( Vector3 * gradient, Vector3 * spins, Interface::State::Ge
 {
     int Na = geometry.n_cells[0];
     int Nb = geometry.n_cells[1];
+    int Nc = geometry.n_cells[2];
 
 #pragma omp parallel for
     for( int i_cell = 0; i_cell < geometry.n_cells_total; i_cell++ )
@@ -43,10 +44,21 @@ void stencil_gradient( Vector3 * gradient, Vector3 * spins, Interface::State::Ge
                 {
                     for( int idx_interaction = 0; idx_interaction < Stencil::N_interaction - 1; idx_interaction++ )
                     {
-                        int idx_j = stencil.get_j( idx_interaction )
-                                    + geometry.n_cell_atoms
-                                          * ( ( a + stencil.get_da( idx_interaction ) )
-                                              + Na * ( b + stencil.get_db( idx_interaction ) + Nb * ( c + stencil.get_dc( idx_interaction ) ) ) );
+                        // Evaluate boundary conditions
+                        int new_a = ( a + stencil.get_da( idx_interaction ) );
+                        int new_b = ( b + stencil.get_db( idx_interaction ) );
+                        int new_c = ( c + stencil.get_dc( idx_interaction ) );
+                        int j     = stencil.get_j( idx_interaction );
+
+                        if( new_a < 0 || new_a >= Na )
+                            new_a = ( geometry.boundary_conditions[0] ) ? new_a % Na : -2 * geometry.nos;
+                        if( new_b < 0 || new_b >= Nb )
+                            new_b = ( geometry.boundary_conditions[1] ) ? new_b % Nb : -2 * geometry.nos;
+                        if( new_c < 0 || new_c >= Nc )
+                            new_c = ( geometry.boundary_conditions[2] ) ? new_c % Nc : -2 * geometry.nos;
+
+                        int idx_j = j + geometry.n_cell_atoms * ( new_a + Na * ( new_b + Nb * ( new_c ) ) );
+
                         if( idx_j >= 0 && idx_j < geometry.nos )
                         {
                             interaction_spins[idx_interaction + 1] = spins[idx_j];
