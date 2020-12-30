@@ -28,10 +28,10 @@ class Solver_VP : public Interface::Solver_Implementation
 public:
     Solver_VP( Interface::State & state )
             : Interface::Solver_Implementation( state ),
-              velocities( state.geometry.nos ),
+              velocities( state.geometry.nos, { 0, 0, 0 } ),
               velocities_previous( state.geometry.nos, { 0, 0, 0 } ),
               forces_previous( state.geometry.nos, { 0, 0, 0 } ),
-              dot( state.geometry.nos ),
+              dot( state.geometry.nos, 0 ),
               projection( 0 ),
               force_norm2( 0 ),
               summator( Kernels::Summator( state.geometry.nos ) ),
@@ -78,9 +78,6 @@ public:
         // clang-format on
 
         // Save force to previous
-        auto force_pr    = forces_previous.data();
-        auto velocity_pr = velocities_previous.data();
-
         forces_previous     = state.fields->gradient;
         velocities_previous = velocities;
     }
