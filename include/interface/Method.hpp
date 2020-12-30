@@ -42,9 +42,9 @@ protected:
     Solver_Implementation * solver = nullptr;
     std::unordered_set<SolverType> eligible_solvers;
 
+public:
     Interface::State & state;
 
-public:
     virtual ~Method_Implementation()
     {
         if( solver != nullptr )
@@ -76,7 +76,7 @@ protected:
     Method_Implementation * m_implementation = nullptr;
 
 public:
-    Method( Method_Implementation * implementation ) : m_implementation( implementation ) {}
+    Method( Interface::State & state, MethodType type );
 
     virtual ~Method()
     {
@@ -86,19 +86,13 @@ public:
         }
     }
 
-    virtual void set_solver( Solver_Implementation * solver )
-    {
-        this->m_implementation->set_solver( solver );
-    }
+    virtual void set_solver( SolverType type );
 
     virtual void iterate( int N_iterations )
     {
         this->m_implementation->iterate( N_iterations );
     }
 };
-
-Solver_Implementation * get_solver_implementation( Interface::State & state, SolverType type );
-Method_Implementation * get_method_implementation( Interface::State & state, MethodType type );
 
 } // namespace Interface
 } // namespace Spirit

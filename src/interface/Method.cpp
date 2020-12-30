@@ -8,31 +8,27 @@ namespace Spirit
 namespace Interface
 {
 
-Solver_Implementation * get_solver_implementation( Interface::State & state, SolverType type )
-{
-    if( type == SolverType::Gradient_Descent )
-    {
-        return new Implementation::Solver_Gradient_Descent( state );
-    }
-    else if( type == SolverType::VP )
-    {
-        return new Implementation::Solver_VP( state );
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-Method_Implementation * get_method_implementation( Interface::State & state, MethodType type )
+Method::Method( Interface::State & state, MethodType type )
 {
     if( type == Minimisation )
     {
-        return new Implementation::Method_Minimize( state );
+        this->m_implementation = new Implementation::Method_Minimize( state );
     }
     else
     {
-        return nullptr;
+        this->m_implementation = nullptr;
+    }
+}
+
+void Method::set_solver( SolverType type )
+{
+    if( type == SolverType::Gradient_Descent )
+    {
+        this->m_implementation->set_solver( new Implementation::Solver_Gradient_Descent( m_implementation->state ) );
+    }
+    else if( type == SolverType::VP )
+    {
+        this->m_implementation->set_solver( new Implementation::Solver_VP( m_implementation->state ) );
     }
 }
 
