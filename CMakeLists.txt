@@ -164,8 +164,14 @@ if(BUILD_API_LIB)
 
         foreach(CURRENT_SUFFIX IN LISTS BACKEND_SUFFIXES)
                 set(library ${META_PROJECT_NAME}_${CURRENT_SUFFIX}_static)
+
                 add_library(${META_PROJECT_NAME}_${CURRENT_SUFFIX}_api SHARED ${API_SRC})
                 target_link_libraries(${META_PROJECT_NAME}_${CURRENT_SUFFIX}_api PUBLIC ${library})
                 target_include_directories(${META_PROJECT_NAME}_${CURRENT_SUFFIX}_api PUBLIC ${API_INCLUDE})
+
+                if(BUILD_TESTS)
+                        set(api_library ${META_PROJECT_NAME}_${CURRENT_SUFFIX}_api)
+                        add_framework_test( test_c_api_${CURRENT_SUFFIX} ${PROJECT_SOURCE_DIR}/tests/test_api.cpp ${api_library} )
+                endif()
         endforeach()
 endif()
