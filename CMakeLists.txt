@@ -8,10 +8,14 @@ set(VULKAN_BACKEND OFF)
 set(USE_OPENMP ON) # Use openMP to accelerate host code and CPU backend
 
 set(BUILD_TESTS ON)
+set(BUILD_API_LIB ON)
+
 # =============================================
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" )
 set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 ### Set a default build type in case none is passed
 if( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
@@ -149,3 +153,19 @@ if(BUILD_TESTS)
 
 endif()
 
+if(BUILD_API_LIB)
+        set( API_SRC
+                ${PROJECT_SOURCE_DIR}/api/src/Hamiltonian.cpp
+                ${PROJECT_SOURCE_DIR}/api/src/Method.cpp
+                ${PROJECT_SOURCE_DIR}/api/src/State.cpp
+        )
+
+        set(API_INCLUDE ${PROJECT_SOURCE_DIR}/api/include )
+
+        foreach(CURRENT_SUFFIX IN LISTS BACKEND_SUFFIXES)
+                set(library ${META_PROJECT_NAME}_${CURRENT_SUFFIX}_static)
+                add_library(${META_PROJECT_NAME}_${CURRENT_SUFFIX}_api SHARED ${API_SRC})
+                target_link_libraries(${META_PROJECT_NAME}_${CURRENT_SUFFIX}_api PUBLIC ${library})
+                target_include_directories(${META_PROJECT_NAME}_${CURRENT_SUFFIX}_api PUBLIC ${API_INCLUDE})
+        endforeach()
+endif()
