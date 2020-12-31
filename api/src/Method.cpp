@@ -5,11 +5,11 @@
 
 void Set_Method( State * state, Method type, Solver solver ) noexcept
 {
-    state->method = Spirit::Interface::Method( state->core_state, Spirit::Interface::MethodType( type ) );
-    state->method.set_solver( Spirit::Interface::SolverType( solver ) );
+    state->method = new Spirit::Interface::Method( state->core_state, Spirit::Interface::MethodType( type ) );
+    state->method->set_solver( Spirit::Interface::SolverType( solver ) );
 }
 
 void Iterate( State * state, int N_iterations ) noexcept
 {
-    state->method.iterate( N_iterations );
+    state->method->iterate( N_iterations );
 }
