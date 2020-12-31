@@ -11,16 +11,17 @@ namespace Spirit
 namespace Interface
 {
 
-enum MethodType
+enum class MethodType
 {
     Minimisation = 0,
-    LLG          = 1
+    LLG          = 1,
+    None         = 2
 };
 
-enum SolverType
+enum class SolverType
 {
     Gradient_Descent = 0,
-    VP               = 1
+    VP               = 1,
 };
 
 class Solver_Implementation

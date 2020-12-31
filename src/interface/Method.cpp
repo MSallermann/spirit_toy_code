@@ -10,7 +10,7 @@ namespace Interface
 
 Method::Method( Interface::State & state, MethodType type )
 {
-    if( type == Minimisation )
+    if( type == MethodType::Minimisation )
     {
         this->m_implementation = new Implementation::Method_Minimize( state );
     }
@@ -29,6 +29,10 @@ void Method::set_solver( SolverType type )
     else if( type == SolverType::VP )
     {
         this->m_implementation->set_solver( new Implementation::Solver_VP( m_implementation->state ) );
+    }
+    else
+    {
+        this->m_implementation = nullptr;
     }
 }
 
