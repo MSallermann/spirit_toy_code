@@ -57,15 +57,7 @@ Summator::~Summator()
 void Summator::sum( scalar * result, scalar * scalarfield )
 {
     cub::DeviceReduce::Sum( temp_storage, temp_storage_bytes, scalarfield, result, N );
-    last_result = result;
 };
-
-scalar Summator::download_last_result()
-{
-    scalar temp;
-    CUDA_HELPER::copy_D2H( &temp, last_result );
-    return temp;
-}
 
 void dot( scalar * result, Vector3 * vf1, Vector3 * vf2, int N )
 {

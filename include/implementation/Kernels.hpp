@@ -18,11 +18,9 @@ struct Summator
     int N;
     size_t temp_storage_bytes; // fields needed for cuda
     void * temp_storage;       // fields needed for cuda
-    scalar * last_result;      // device pointer to last computed result
     Summator( int N );
     ~Summator();
     void sum( scalar * result, scalar * scalarfield );
-    scalar download_last_result(); // downloads last result to host and returns it
 };
 
 void dot( scalar * result, Vector3 * vf1, Vector3 * vf2, int N );

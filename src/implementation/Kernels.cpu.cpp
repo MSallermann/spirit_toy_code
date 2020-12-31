@@ -39,14 +39,8 @@ void Summator::sum( scalar * result, scalar * scalarfield )
     {
         res += scalarfield[idx];
     }
-    *result     = res;
-    last_result = result;
+    *result = res;
 };
-
-scalar Summator::download_last_result()
-{
-    return *last_result;
-}
 
 void dot( scalar * result, Vector3 * vf1, Vector3 * vf2, int N )
 {
